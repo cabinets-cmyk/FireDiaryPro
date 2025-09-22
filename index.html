@@ -509,6 +509,12 @@
                     <input type="text" id="incidentNumber" name="incidentNumber" required 
                            placeholder="e.g 621223" autocomplete="off">
                 </div>
+
+                <div class="form-group">
+                    <label for="dfesId">DFES ID Number *</label>
+                    <input type="text" id="dfesId" name="dfesId" required 
+                           placeholder="e.g., 123456" autocomplete="off">
+                </div>
                 
                 <div class="form-group">
                     <label for="userRole">Your Role *</label>
@@ -587,6 +593,7 @@
         let appState = {
             author: '',
             incidentNumber: '',
+            dfesId: '',
             role: '',
             notes: [],
             currentTab: 'setup',
@@ -650,8 +657,8 @@
             getElement('emailBtn').addEventListener('click', emailReport);
             getElement('clearDataBtn').addEventListener('click', clearAllData);
 
-            // Auto-save on input (setup form)
-            ['authorName', 'incidentNumber', 'userRole'].forEach(id => {
+            // Auto-save on input (setup form) - added dfesId
+            ['authorName', 'incidentNumber', 'dfesId', 'userRole'].forEach(id => {
                 const el = getElement(id);
                 if (el) el.addEventListener('input', saveData);
             });
@@ -810,9 +817,10 @@
             try {
                 appState.author = getElement('authorName').value.trim();
                 appState.incidentNumber = getElement('incidentNumber').value.trim();
+                appState.dfesId = getElement('dfesId').value.trim();
                 appState.role = getElement('userRole').value.trim();
 
-                if (appState.author && appState.incidentNumber && appState.role) {
+                if (appState.author && appState.incidentNumber && appState.dfesId && appState.role) {
                     updateIncidentInfo();
                     saveData();
                     switchTab('notes');
@@ -829,13 +837,13 @@
         }
 
         function isSetupComplete() {
-            return appState.author && appState.incidentNumber && appState.role;
+            return appState.author && appState.incidentNumber && appState.dfesId && appState.role;
         }
 
         function updateIncidentInfo() {
             const infoEl = getElement('incidentInfo');
             if (infoEl) {
-                infoEl.textContent = `${appState.incidentNumber} | ${appState.author} (${appState.role})`;
+                infoEl.textContent = `${appState.incidentNumber} | DFES ID: ${appState.dfesId} | ${appState.author} (${appState.role})`;
             }
         }
 
@@ -967,7 +975,7 @@
             }).join('');
         }
 
-        // Report Generation (updated with new requirements)
+        // Report Generation (updated with DFES ID)
         function generateReport() {
             const previewEl = getElement('reportPreview');
             if (!previewEl) return;
@@ -985,6 +993,7 @@
                     <h2 class="report-title">Incident Report</h2>
                     <div class="report-meta">
                         <div><strong>Incident:</strong> ${appState.incidentNumber}</div>
+                        <div><strong>DFES ID:</strong> ${appState.dfesId}</div>
                         <div><strong>Author:</strong> ${appState.author}</div>
                         <div><strong>Role:</strong> ${appState.role}</div>
                         <div><strong>Date:</strong> ${reportDate}</div>
@@ -1009,7 +1018,7 @@
             });
         }
 
-        // Export Functions (updated for new report format)
+        // Export Functions (updated for DFES ID)
         function downloadTxtReport() {
             const content = generateTextReport();
             downloadFile(content, `incident-report-${appState.incidentNumber}.txt`, 'text/plain');
@@ -1023,6 +1032,7 @@
         function generateTextReport() {
             let report = `INCIDENT REPORT\n${'='.repeat(50)}\n\n`;
             report += `Incident: ${appState.incidentNumber}\n`;
+            report += `DFES ID: ${appState.dfesId}\n`;
             report += `Author: ${appState.author}\n`;
             report += `Role: ${appState.role}\n`;
             report += `Date: ${new Date().toLocaleDateString()}\n`;
@@ -1048,6 +1058,7 @@
                     <h2>Incident Report</h2>
                     <div class="meta">
                         <div><strong>Incident:</strong> ${appState.incidentNumber}</div>
+                        <div><strong>DFES ID:</strong> ${appState.dfesId}</div>
                         <div><strong>Author:</strong> ${appState.author}</div>
                         <div><strong>Role:</strong> ${appState.role}</div>
                         <div><strong>Date:</strong> ${new Date().toLocaleDateString()}</div>
@@ -1084,7 +1095,7 @@
             URL.revokeObjectURL(url);
         }
 
-        // Data Persistence
+        // Data Persistence (updated for DFES ID)
         function saveData() {
             try {
                 const data = { ...appState };
@@ -1101,15 +1112,16 @@
                     const data = JSON.parse(saved);
                     appState.author = data.author || '';
                     appState.incidentNumber = data.incidentNumber || '';
+                    appState.dfesId = data.dfesId || '';
                     appState.role = data.role || '';
                     appState.notes = data.notes || [];
                     appState.currentTab = data.currentTab || 'setup';
 
                     // Populate form
-                    ['authorName', 'incidentNumber', 'userRole'].forEach(id => {
-                        const el = getElement(id);
-                        if (el) el.value = appState[id.replace('Name', '').toLowerCase()] || '';
-                    });
+                    getElement('authorName').value = appState.author;
+                    getElement('incidentNumber').value = appState.incidentNumber;
+                    getElement('dfesId').value = appState.dfesId;
+                    getElement('userRole').value = appState.role;
 
                     if (isSetupComplete()) {
                         updateIncidentInfo();
@@ -1123,7 +1135,7 @@
         function clearAllData() {
             if (confirm('Clear all data?')) {
                 localStorage.removeItem('incidentDiaryProData');
-                appState = { author: '', incidentNumber: '', role: '', notes: [], currentTab: 'setup', isRecording: false, recognition: null };
+                appState = { author: '', incidentNumber: '', dfesId: '', role: '', notes: [], currentTab: 'setup', isRecording: false, recognition: null };
                 getElement('setupForm').reset();
                 getElement('noteInput').value = '';
                 getElement('searchInput').value = '';
