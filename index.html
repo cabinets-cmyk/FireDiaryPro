@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDP Incident Diary Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(90deg, #ff4444 0%, #cc3333 100%);
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 0.25rem;
+            letter-spacing: 0.1em;
+        }
+
+        .header h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .incident-info {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            background: #333;
+            border-bottom: 2px solid #ff4444;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 1rem;
+            background: none;
+            border: none;
+            color: #ccc;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab-btn.active {
+            color: #ff4444;
+            background: #2a2a2a;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #ff4444;
+        }
+
+        .tab-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            flex: 1;
+            padding: 1rem;
+            display: none;
+            overflow-y: auto;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Setup Tab */
+        .setup-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #ff4444;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #444;
+            border-radius: 8px;
+            background: #2a2a2a;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #ff4444;
+            box-shadow: 0 0 0 3px rgba(255, 68, 68, 0.2);
+        }
+
+        .btn {
+            background: linear-gradient(90deg, #ff4444 0%, #cc3333 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 68, 68, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Notes Tab */
+        .notes-controls {
+            margin-bottom: 1rem;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 2.5rem 0.75rem 1rem;
+            border: 2px solid #444;
+            border-radius: 8px;
+            background: #2a2a2a;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #ccc;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            display: none;
+        }
+
+        .note-input-container {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .note-input {
+            width: 100%;
+            min-height: 100px;
+            padding: 0.75rem;
+            border: 2px solid #444;
+            border-radius: 8px;
+            background: #2a2a2a;
+            color: #fff;
+            font-size: 1rem;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .voice-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .voice-btn {
+            background: #444;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .voice-btn.recording {
+            background: #ff4444;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .notes-list {
+            margin-top: 1rem;
+        }
+
+        .note-item {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .note-item.highlight {
+            border-color: #ff4444;
+            box-shadow: 0 0 10px rgba(255, 68, 68, 0.3);
+        }
+
+        .note-header {
+            background: #333;
+            padding: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .note-timestamp {
+            color: #ff4444;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .note-action-btn {
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            padding: 0.25rem;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .note-action-btn:hover {
+            color: #ff4444;
+        }
+
+        .note-content {
+            padding: 0.75rem;
+            display: block; /* Changed to block by default for visibility */
+            border-top: 1px solid #444;
+        }
+
+        .note-content.expanded {
+            display: block;
+        }
+
+        .note-text {
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .note-edit {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.5rem;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background: #1a1a1a;
+            color: #fff;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        /* Report Tab */
+        .report-preview {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .report-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #ff4444;
+        }
+
+        .report-title {
+            font-size: 1.5rem;
+            color: #ff4444;
+            margin-bottom: 1rem;
+        }
+
+        .report-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .report-notes {
+            margin-top: 2rem;
+        }
+
+        .report-note {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #444;
+        }
+
+        .report-note:last-child {
+            border-bottom: none;
+        }
+
+        .report-note-time {
+            color: #ff4444;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-secondary {
+            background: #444;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: #555;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        /* Status Messages */
+        .status-message {
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid #22c55e;
+            color: #22c55e;
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+
+        .status-info {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid #3b82f6;
+            color: #3b82f6;
+        }
+
+        /* Responsive Design */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 768px;
+                margin: 0 auto;
+                border-left: 1px solid #444;
+                border-right: 1px solid #444;
+            }
+
+            .report-meta {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+
+            .report-actions {
+                justify-content: center;
+            }
+
+            .btn {
+                width: auto;
+                min-width: 200px;
+            }
+        }
+
+        /* Touch-friendly sizing */
+        @media (max-width: 767px) {
+            .tab-btn {
+                padding: 1.2rem 0.5rem;
+                font-size: 0.8rem;
+            }
+
+            .btn, .voice-btn {
+                padding: 1rem;
+                font-size: 1.1rem;
+            }
+
+            .note-header {
+                padding: 1rem;
+            }
+
+            .note-action-btn {
+                padding: 0.5rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">IDP</div>
+            <h1>Incident Diary Pro</h1>
+            <div class="incident-info" id="incidentInfo">
+                Incident Logger - Set up your incident details
+            </div>
+        </header>
+
+        <!-- Tab Navigation -->
+        <nav class="tab-nav" role="tablist">
+            <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="setup-tab" id="setup-btn">
+                📋 Setup
+            </button>
+            <button class="tab-btn" role="tab" aria-selected="false" aria-controls="notes-tab" id="notes-btn" disabled>
+                📝 Notes
+            </button>
+            <button class="tab-btn" role="tab" aria-selected="false" aria-controls="report-tab" id="report-btn" disabled>
+                📄 Report
+            </button>
+        </nav>
+
+        <!-- Setup Tab -->
+        <main class="tab-content active" id="setup-tab" role="tabpanel" aria-labelledby="setup-btn">
+            <form class="setup-form" id="setupForm">
+                <div class="form-group">
+                    <label for="authorName">Author Name *</label>
+                    <input type="text" id="authorName" name="authorName" required 
+                           placeholder="Enter your full name" autocomplete="name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="incidentNumber">Incident Number *</label>
+                    <input type="text" id="incidentNumber" name="incidentNumber" required 
+                           placeholder="e.g 621223" autocomplete="off">
+                </div>
+                
+                <div class="form-group">
+                    <label for="userRole">Your Role *</label>
+                    <input type="text" id="userRole" name="userRole" required 
+                           placeholder="e.g., RDC, IC, OO, PO, PIO, LO" autocomplete="organization-title">
+                </div>
+                
+                <button type="submit" class="btn" id="submitBtn">
+                    Start Logging Notes
+                </button>
+            </form>
+            <div id="setupStatus" class="status-message" style="display: none;"></div>
+        </main>
+
+        <!-- Notes Tab -->
+        <main class="tab-content" id="notes-tab" role="tabpanel" aria-labelledby="notes-btn">
+            <div class="notes-controls">
+                <!-- Note Input -->
+                <div class="note-input-container">
+                    <textarea class="note-input" id="noteInput" 
+                              placeholder="Enter your note here..." 
+                              aria-label="Note content"></textarea>
+                    
+                    <div class="voice-controls">
+                        <button class="voice-btn" id="voiceBtn" aria-label="Start voice recording">
+                            🎤 Voice
+                        </button>
+                        <button class="btn" id="addNoteBtn">
+                            Add Note
+                        </button>
+                    </div>
+                </div>
+
+                <div id="voiceStatus" class="status-message" style="display: none;"></div>
+
+                <!-- Search (moved under Add Note section) -->
+                <div class="search-container">
+                    <input type="text" class="search-input" id="searchInput" 
+                           placeholder="Search notes by keyword..." aria-label="Search notes">
+                    <button class="search-clear" id="searchClear" aria-label="Clear search">×</button>
+                </div>
+            </div>
+
+            <div class="notes-list" id="notesList" role="region" aria-label="Notes list">
+                <div class="status-message status-info">No notes yet. Add your first note above!</div>
+            </div>
+        </main>
+
+        <!-- Report Tab -->
+        <main class="tab-content" id="report-tab" role="tabpanel" aria-labelledby="report-btn">
+            <div class="report-preview" id="reportPreview">
+                <div class="status-message status-info">Complete setup and add notes to generate a report.</div>
+            </div>
+            
+            <div class="report-actions">
+                <button class="btn" id="downloadTxtBtn" disabled>
+                    📄 Download TXT
+                </button>
+                <button class="btn btn-secondary" id="downloadHtmlBtn" disabled>
+                    🌐 Download HTML
+                </button>
+                <button class="btn btn-secondary" id="emailBtn" disabled>
+                    📧 Email Report
+                </button>
+                <button class="btn btn-secondary" id="clearDataBtn">
+                    🗑️ Clear All Data
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        console.log('Incident Diary Pro script starting...');
+
+        // Application State
+        let appState = {
+            author: '',
+            incidentNumber: '',
+            role: '',
+            notes: [],
+            currentTab: 'setup',
+            isRecording: false,
+            recognition: null
+        };
+
+        // Safe DOM getter
+        function getElement(id) {
+            const el = document.getElementById(id);
+            if (!el) {
+                console.error(`Element with ID '${id}' not found.`);
+            }
+            return el;
+        }
+
+        // Initialize Application
+        function init() {
+            console.log('Initializing Incident Diary Pro...');
+            try {
+                loadData();
+                setupEventListeners();
+                setupSpeechRecognition();
+                updateUI();
+                console.log('Initialization complete.');
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showStatus('setupStatus', 'Error loading app. Please refresh.', 'error');
+            }
+        }
+
+        // Event Listeners Setup
+        function setupEventListeners() {
+            console.log('Setting up event listeners...');
+
+            // Tab navigation
+            getElement('setup-btn').addEventListener('click', () => switchTab('setup'));
+            getElement('notes-btn').addEventListener('click', () => switchTab('notes'));
+            getElement('report-btn').addEventListener('click', () => switchTab('report'));
+
+            // Setup form
+            getElement('setupForm').addEventListener('submit', handleSetupSubmit);
+
+            // Notes functionality
+            getElement('addNoteBtn').addEventListener('click', addNote);
+            getElement('voiceBtn').addEventListener('click', toggleVoiceRecording);
+            getElement('noteInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault();
+                    addNote();
+                }
+            });
+
+            // Search
+            getElement('searchInput').addEventListener('input', handleSearch);
+            getElement('searchClear').addEventListener('click', clearSearch);
+
+            // Report actions
+            getElement('downloadTxtBtn').addEventListener('click', downloadTxtReport);
+            getElement('downloadHtmlBtn').addEventListener('click', downloadHtmlReport);
+            getElement('emailBtn').addEventListener('click', emailReport);
+            getElement('clearDataBtn').addEventListener('click', clearAllData);
+
+            // Auto-save on input (setup form)
+            ['authorName', 'incidentNumber', 'userRole'].forEach(id => {
+                const el = getElement(id);
+                if (el) el.addEventListener('input', saveData);
+            });
+
+            // Event delegation for notes list (handles clicks on dynamic elements)
+            getElement('notesList').addEventListener('click', handleNotesListClick);
+
+            console.log('Event listeners set up.');
+        }
+
+        // Event delegation for notes interactions
+        function handleNotesListClick(e) {
+            const target = e.target;
+            const noteItem = target.closest('.note-item');
+            if (!noteItem) return;
+
+            const noteId = parseInt(noteItem.dataset.noteId);
+
+            if (target.classList.contains('note-header') || target.closest('.note-header')) {
+                toggleNoteExpansion(noteId);
+            } else if (target.matches('.edit-btn')) {
+                editNoteInline(noteId);
+            } else if (target.matches('.delete-btn')) {
+                deleteNote(noteId);
+            } else if (target.matches('.save-edit-btn')) {
+                const textarea = target.previousElementSibling.querySelector('textarea');
+                const newText = textarea ? textarea.value.trim() : '';
+                saveNoteEdit(noteId, newText);
+            } else if (target.matches('.cancel-edit-btn')) {
+                cancelNoteEdit(noteId);
+            }
+        }
+
+        // Speech Recognition Setup
+        function setupSpeechRecognition() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                console.log('Speech recognition not supported.');
+                const voiceBtn = getElement('voiceBtn');
+                if (voiceBtn) {
+                    voiceBtn.disabled = true;
+                    voiceBtn.textContent = '🎤 Not Supported';
+                    voiceBtn.title = 'Speech recognition not supported in this browser';
+                }
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            appState.recognition = new SpeechRecognition();
+
+            appState.recognition.continuous = false; // Simplified for reliability
+            appState.recognition.interimResults = false;
+            appState.recognition.lang = 'en-US';
+
+            appState.recognition.onstart = () => {
+                appState.isRecording = true;
+                const btn = getElement('voiceBtn');
+                if (btn) {
+                    btn.classList.add('recording');
+                    btn.textContent = '🔴 Stop';
+                }
+                showStatus('voiceStatus', 'Listening... Speak now', 'info');
+            };
+
+            appState.recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                const noteInput = getElement('noteInput');
+                if (noteInput && transcript) {
+                    noteInput.value += (noteInput.value ? ' ' : '') + transcript;
+                    showStatus('voiceStatus', 'Voice input added!', 'success');
+                }
+            };
+
+            appState.recognition.onerror = (event) => {
+                console.error('Speech error:', event.error);
+                showStatus('voiceStatus', `Voice error: ${event.error}`, 'error');
+                stopVoiceRecording();
+            };
+
+            appState.recognition.onend = () => {
+                stopVoiceRecording();
+            };
+
+            console.log('Speech recognition set up.');
+        }
+
+        // Voice Functions
+        function toggleVoiceRecording() {
+            if (appState.isRecording) {
+                stopVoiceRecording();
+            } else {
+                startVoiceRecording();
+            }
+        }
+
+        function startVoiceRecording() {
+            if (appState.recognition && !appState.isRecording) {
+                try {
+                    appState.recognition.start();
+                } catch (error) {
+                    console.error('Failed to start recording:', error);
+                    showStatus('voiceStatus', 'Could not start voice recognition', 'error');
+                }
+            }
+        }
+
+        function stopVoiceRecording() {
+            if (appState.recognition && appState.isRecording) {
+                appState.recognition.stop();
+            }
+            appState.isRecording = false;
+            const btn = getElement('voiceBtn');
+            if (btn) {
+                btn.classList.remove('recording');
+                btn.textContent = '🎤 Voice';
+            }
+            setTimeout(() => hideStatus('voiceStatus'), 3000);
+        }
+
+        // Tab Management
+        function switchTab(tabName) {
+            console.log('Switching to tab:', tabName);
+            if (tabName !== 'setup' && !isSetupComplete()) {
+                showStatus('voiceStatus', 'Please complete setup first', 'error');
+                return;
+            }
+
+            appState.currentTab = tabName;
+
+            // Update buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                const isActive = btn.id === `${tabName}-btn`;
+                btn.classList.toggle('active', isActive);
+                btn.setAttribute('aria-selected', isActive);
+                btn.disabled = false; // Enable all after setup
+            });
+
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.toggle('active', content.id === `${tabName}-tab`);
+            });
+
+            if (tabName === 'notes') {
+                renderNotes();
+            } else if (tabName === 'report') {
+                generateReport();
+            }
+
+            saveData();
+        }
+
+        // Setup Handling
+        function handleSetupSubmit(e) {
+            e.preventDefault();
+            console.log('Setup submitted.');
+
+            try {
+                appState.author = getElement('authorName').value.trim();
+                appState.incidentNumber = getElement('incidentNumber').value.trim();
+                appState.role = getElement('userRole').value.trim();
+
+                if (appState.author && appState.incidentNumber && appState.role) {
+                    updateIncidentInfo();
+                    saveData();
+                    switchTab('notes');
+                    getElement('noteInput').focus();
+                    showStatus('setupStatus', 'Setup complete! Start adding notes.', 'success');
+                    setTimeout(() => hideStatus('setupStatus'), 3000);
+                } else {
+                    showStatus('setupStatus', 'Please fill all fields.', 'error');
+                }
+            } catch (error) {
+                console.error('Setup error:', error);
+                showStatus('setupStatus', 'Error saving setup.', 'error');
+            }
+        }
+
+        function isSetupComplete() {
+            return appState.author && appState.incidentNumber && appState.role;
+        }
+
+        function updateIncidentInfo() {
+            const infoEl = getElement('incidentInfo');
+            if (infoEl) {
+                infoEl.textContent = `${appState.incidentNumber} | ${appState.author} (${appState.role})`;
+            }
+        }
+
+        // Notes Management
+        function addNote() {
+            const noteText = getElement('noteInput').value.trim();
+            if (!noteText) return;
+
+            const note = {
+                id: Date.now(),
+                timestamp: new Date(),
+                text: noteText,
+                author: appState.author
+            };
+
+            appState.notes.unshift(note);
+            getElement('noteInput').value = '';
+            saveData();
+            renderNotes();
+            showStatus('voiceStatus', 'Note added!', 'success');
+            setTimeout(() => hideStatus('voiceStatus'), 2000);
+        }
+
+        function deleteNote(noteId) {
+            if (confirm('Delete this note?')) {
+                appState.notes = appState.notes.filter(note => note.id !== noteId);
+                saveData();
+                renderNotes();
+            }
+        }
+
+        function editNote(noteId, newText) {
+            const note = appState.notes.find(n => n.id === noteId);
+            if (note && newText.trim()) {
+                note.text = newText.trim();
+                note.lastModified = new Date();
+                saveData();
+                renderNotes();
+            }
+        }
+
+        function toggleNoteExpansion(noteId) {
+            const content = document.querySelector(`#note-content-${noteId}`);
+            if (content) {
+                content.classList.toggle('expanded');
+            }
+        }
+
+        function editNoteInline(noteId) {
+            const textEl = document.getElementById(`note-text-${noteId}`);
+            if (!textEl) return;
+
+            const originalText = appState.notes.find(n => n.id === noteId).text;
+            textEl.innerHTML = `
+                <textarea class="note-edit" id="edit-${noteId}">${originalText}</textarea>
+                <div style="margin-top: 0.5rem;">
+                    <button class="btn save-edit-btn" style="width: auto; margin-right: 0.5rem;">Save</button>
+                    <button class="btn btn-secondary cancel-edit-btn" style="width: auto;">Cancel</button>
+                </div>
+            `;
+            document.getElementById(`edit-${noteId}`).focus();
+        }
+
+        function saveNoteEdit(noteId, newText) {
+            editNote(noteId, newText);
+        }
+
+        function cancelNoteEdit(noteId) {
+            renderNotes(getElement('searchInput').value.toLowerCase());
+        }
+
+        // Search
+        function handleSearch() {
+            const searchTerm = getElement('searchInput').value.toLowerCase();
+            renderNotes(searchTerm);
+            getElement('searchClear').style.display = searchTerm ? 'block' : 'none';
+        }
+
+        function clearSearch() {
+            getElement('searchInput').value = '';
+            getElement('searchClear').style.display = 'none';
+            renderNotes();
+        }
+
+        function highlightSearchTerm(text, searchTerm) {
+            if (!searchTerm) return text;
+            const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            return text.replace(regex, '<mark style="background: #ff4444; color: white; padding: 0 2px;">$1</mark>');
+        }
+
+        // Render Notes (notes are now expanded by default)
+        function renderNotes(searchTerm = '') {
+            let filteredNotes = appState.notes;
+            if (searchTerm) {
+                filteredNotes = appState.notes.filter(note => 
+                    note.text.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            const listEl = getElement('notesList');
+            if (!listEl) return;
+
+            if (filteredNotes.length === 0) {
+                listEl.innerHTML = searchTerm ? 
+                    '<div class="status-message status-info">No notes found.</div>' :
+                    '<div class="status-message status-info">No notes yet. Add your first note above!</div>';
+                return;
+            }
+
+            listEl.innerHTML = filteredNotes.map(note => {
+                const formattedTime = formatTimestamp(note.timestamp, 'notes'); // 12hr for notes list
+                const highlightedText = highlightSearchTerm(note.text, searchTerm);
+                const isHighlighted = searchTerm && note.text.toLowerCase().includes(searchTerm);
+                
+                return `
+                    <div class="note-item ${isHighlighted ? 'highlight' : ''}" data-note-id="${note.id}">
+                        <div class="note-header">
+                            <div class="note-timestamp">${formattedTime}</div>
+                            <div class="note-actions">
+                                <button class="note-action-btn edit-btn" aria-label="Edit" title="Edit">✏️</button>
+                                <button class="note-action-btn delete-btn" aria-label="Delete" title="Delete">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="note-content" id="note-content-${note.id}">
+                            <div class="note-text" id="note-text-${note.id}">${highlightedText}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Report Generation (updated with new requirements)
+        function generateReport() {
+            const previewEl = getElement('reportPreview');
+            if (!previewEl) return;
+
+            if (!isSetupComplete() || appState.notes.length === 0) {
+                previewEl.innerHTML = '<div class="status-message status-info">Add notes to generate report.</div>';
+                return;
+            }
+
+            const reportDate = new Date().toLocaleDateString();
+            const totalNotes = appState.notes.length;
+
+            previewEl.innerHTML = `
+                <div class="report-header">
+                    <h2 class="report-title">Incident Report</h2>
+                    <div class="report-meta">
+                        <div><strong>Incident:</strong> ${appState.incidentNumber}</div>
+                        <div><strong>Author:</strong> ${appState.author}</div>
+                        <div><strong>Role:</strong> ${appState.role}</div>
+                        <div><strong>Date:</strong> ${reportDate}</div>
+                        <div><strong>Total Notes:</strong> ${totalNotes}</div>
+                    </div>
+                </div>
+                <div class="report-notes">
+                    <h3 style="color: #ff4444; margin-bottom: 1rem;">Incident Notes</h3>
+                    ${appState.notes.slice().reverse().map((note) => `
+                        <div class="report-note">
+                            <div class="report-note-time">${formatTimestamp(note.timestamp, 'report')}</div>
+                            <div class="note-text">${escapeHtml(note.text)}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            // Enable download buttons
+            ['downloadTxtBtn', 'downloadHtmlBtn', 'emailBtn'].forEach(id => {
+                const btn = getElement(id);
+                if (btn) btn.disabled = false;
+            });
+        }
+
+        // Export Functions (updated for new report format)
+        function downloadTxtReport() {
+            const content = generateTextReport();
+            downloadFile(content, `incident-report-${appState.incidentNumber}.txt`, 'text/plain');
+        }
+
+        function downloadHtmlReport() {
+            const content = generateHTMLReport();
+            downloadFile(content, `incident-report-${appState.incidentNumber}.html`, 'text/html');
+        }
+
+        function generateTextReport() {
+            let report = `INCIDENT REPORT\n${'='.repeat(50)}\n\n`;
+            report += `Incident: ${appState.incidentNumber}\n`;
+            report += `Author: ${appState.author}\n`;
+            report += `Role: ${appState.role}\n`;
+            report += `Date: ${new Date().toLocaleDateString()}\n`;
+            report += `Total Notes: ${appState.notes.length}\n\n`;
+            report += `INCIDENT NOTES\n${'-'.repeat(30)}\n\n`;
+
+            appState.notes.slice().reverse().forEach((note) => {
+                report += `${formatTimestamp(note.timestamp, 'report')}\n${note.text}\n\n`;
+            });
+
+            return report;
+        }
+
+        function generateHTMLReport() {
+            return `
+                <!DOCTYPE html>
+                <html><head><title>Incident Report - ${appState.incidentNumber}</title>
+                <style>body{font-family:Arial;max-width:800px;margin:20px auto;padding:20px;}
+                h2{color:#cc3333;} .meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+                .note{margin-bottom:20px;border-bottom:1px solid #ccc;padding-bottom:10px;}
+                .time{color:#cc3333;font-weight:bold;}</style></head>
+                <body>
+                    <h2>Incident Report</h2>
+                    <div class="meta">
+                        <div><strong>Incident:</strong> ${appState.incidentNumber}</div>
+                        <div><strong>Author:</strong> ${appState.author}</div>
+                        <div><strong>Role:</strong> ${appState.role}</div>
+                        <div><strong>Date:</strong> ${new Date().toLocaleDateString()}</div>
+                        <div><strong>Total Notes:</strong> ${appState.notes.length}</div>
+                    </div>
+                    <h3 style="color:#cc3333;">Incident Notes</h3>
+                    ${appState.notes.slice().reverse().map((note) => `
+                        <div class="note">
+                            <div class="time">${formatTimestamp(note.timestamp, 'report')}</div>
+                            <p>${escapeHtml(note.text)}</p>
+                        </div>
+                    `).join('')}
+                </body></html>
+            `;
+        }
+
+        function emailReport() {
+            const content = generateTextReport();
+            const subject = encodeURIComponent(`Incident Report - ${appState.incidentNumber}`);
+            const body = encodeURIComponent(content);
+            window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        }
+
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Data Persistence
+        function saveData() {
+            try {
+                const data = { ...appState };
+                localStorage.setItem('incidentDiaryProData', JSON.stringify(data));
+            } catch (error) {
+                console.error('Save error:', error);
+            }
+        }
+
+        function loadData() {
+            try {
+                const saved = localStorage.getItem('incidentDiaryProData');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    appState.author = data.author || '';
+                    appState.incidentNumber = data.incidentNumber || '';
+                    appState.role = data.role || '';
+                    appState.notes = data.notes || [];
+                    appState.currentTab = data.currentTab || 'setup';
+
+                    // Populate form
+                    ['authorName', 'incidentNumber', 'userRole'].forEach(id => {
+                        const el = getElement(id);
+                        if (el) el.value = appState[id.replace('Name', '').toLowerCase()] || '';
+                    });
+
+                    if (isSetupComplete()) {
+                        updateIncidentInfo();
+                    }
+                }
+            } catch (error) {
+                console.error('Load error:', error);
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('Clear all data?')) {
+                localStorage.removeItem('incidentDiaryProData');
+                appState = { author: '', incidentNumber: '', role: '', notes: [], currentTab: 'setup', isRecording: false, recognition: null };
+                getElement('setupForm').reset();
+                getElement('noteInput').value = '';
+                getElement('searchInput').value = '';
+                getElement('incidentInfo').textContent = 'Incident Logger - Set up your incident details';
+                switchTab('setup');
+                renderNotes();
+                generateReport();
+                showStatus('voiceStatus', 'Data cleared.', 'success');
+                setTimeout(() => hideStatus('voiceStatus'), 2000);
+            }
+        }
+
+        // Utilities (updated timestamp formats)
+        function formatTimestamp(timestamp, type = 'notes') {
+            const date = new Date(timestamp);
+            if (type === 'report') {
+                // DD/MM/YY HH:mm:ss (24hr)
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = String(date.getFullYear()).slice(-2);
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                const seconds = String(date.getSeconds()).padStart(2, '0');
+                return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+            } else {
+                // Keep original 12hr format for notes list
+                return date.toLocaleString('en-US', {
+                    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true
+                });
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showStatus(statusId, message, type) {
+            const el = getElement(statusId);
+            if (el) {
+                el.textContent = message;
+                el.className = `status-message status-${type}`;
+                el.style.display = 'block';
+            }
+        }
+
+        function hideStatus(statusId) {
+            const el = getElement(statusId);
+            if (el) el.style.display = 'none';
+        }
+
+        function updateUI() {
+            const isComplete = isSetupComplete();
+            getElement('notes-btn').disabled = !isComplete;
+            getElement('report-btn').disabled = !isComplete;
+
+            if (isComplete) {
+                switchTab(appState.currentTab || 'notes');
+            }
+        }
+
+        // Start the app
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
