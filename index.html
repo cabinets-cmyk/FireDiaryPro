@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IDP Incident Diary Pro</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Incident Diary Pro (No Storage)</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        /* Reset */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -36,17 +33,8 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
 
-        .logo {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #fff;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            margin-bottom: 0.25rem;
-            letter-spacing: 0.1em;
-        }
-
         .header h1 {
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 0.25rem;
         }
@@ -91,10 +79,7 @@
             background: #ff4444;
         }
 
-        .tab-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+        .tab-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         /* Tab Content */
         .tab-content {
@@ -104,19 +89,12 @@
             overflow-y: auto;
         }
 
-        .tab-content.active {
-            display: block;
-        }
+        .tab-content.active { display: block; }
 
         /* Setup Tab */
-        .setup-form {
-            max-width: 400px;
-            margin: 0 auto;
-        }
+        .setup-form { max-width: 400px; margin: 0 auto; }
 
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
+        .form-group { margin-bottom: 1.5rem; }
 
         .form-group label {
             display: block;
@@ -141,6 +119,21 @@
             box-shadow: 0 0 0 3px rgba(255, 68, 68, 0.2);
         }
 
+        .no-incident-checkbox {
+            display: flex;
+            align-items: center;
+            margin-top: 0.5rem;
+            gap: 0.5rem;
+        }
+
+        .no-incident-checkbox input[type="checkbox"] { transform: scale(1.2); }
+
+        .no-incident-checkbox label {
+            color: #ccc;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
         .btn {
             background: linear-gradient(90deg, #ff4444 0%, #cc3333 100%);
             color: white;
@@ -160,25 +153,27 @@
             box-shadow: 0 4px 15px rgba(255, 68, 68, 0.3);
         }
 
-        .btn:active {
-            transform: translateY(0);
+        .btn:active { transform: translateY(0); }
+
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .btn-danger {
+            background: linear-gradient(90deg, #dc2626 0%, #b91c1c 100%);
         }
 
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
+        .btn-danger:hover { box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3); }
+
+        .btn-secondary { background: #444; color: #fff; }
+        .btn-secondary:hover {
+            background: #555;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
         /* Notes Tab */
-        .notes-controls {
-            margin-bottom: 1rem;
-        }
+        .notes-controls { margin-bottom: 1rem; }
 
-        .search-container {
-            position: relative;
-            margin-bottom: 1rem;
-        }
+        .search-container { position: relative; margin-bottom: 1rem; }
 
         .search-input {
             width: 100%;
@@ -204,10 +199,7 @@
             display: none;
         }
 
-        .note-input-container {
-            position: relative;
-            margin-bottom: 1rem;
-        }
+        .note-input-container { position: relative; margin-bottom: 1rem; }
 
         .note-input {
             width: 100%;
@@ -222,17 +214,34 @@
             font-family: inherit;
         }
 
-        .voice-controls {
+        .input-row {
             display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        .input-row .btn, .input-row .voice-btn, .input-row .photo-btn {
+            flex: 1;
+            padding: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .follow-up-input {
+            display: flex;
+            align-items: center;
             gap: 0.5rem;
             margin-top: 0.5rem;
         }
 
-        .voice-btn {
+        .follow-up-input input[type="checkbox"] { transform: scale(1.2); }
+
+        .follow-up-input label { color: #ff4444; font-weight: 600; }
+
+        .voice-btn, .photo-btn {
             background: #444;
             color: #fff;
             border: none;
-            padding: 0.5rem 1rem;
             border-radius: 6px;
             font-size: 0.9rem;
             cursor: pointer;
@@ -240,19 +249,13 @@
             flex: 1;
         }
 
-        .voice-btn.recording {
-            background: #ff4444;
-            animation: pulse 1s infinite;
-        }
+        .voice-btn.recording { background: #ff4444; animation: pulse 1s infinite; }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
 
-        .notes-list {
-            margin-top: 1rem;
-        }
+        input[type="file"] { display: none; }
+
+        .notes-list { margin-top: 1rem; }
 
         .note-item {
             background: #2a2a2a;
@@ -277,16 +280,9 @@
             cursor: pointer;
         }
 
-        .note-timestamp {
-            color: #ff4444;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
+        .note-timestamp { color: #ff4444; font-weight: 600; font-size: 0.9rem; }
 
-        .note-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
+        .note-actions { display: flex; gap: 0.5rem; }
 
         .note-action-btn {
             background: none;
@@ -298,24 +294,91 @@
             transition: color 0.3s ease;
         }
 
-        .note-action-btn:hover {
-            color: #ff4444;
-        }
+        .note-action-btn:hover { color: #ff4444; }
 
         .note-content {
             padding: 0.75rem;
-            display: block; /* Changed to block by default for visibility */
+            display: block;
             border-top: 1px solid #444;
         }
 
-        .note-content.expanded {
+        .note-followup-header { margin-bottom: 0.5rem; }
+        .note-followup-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .note-followup-checkbox { transform: scale(1.2); }
+
+        .note-followup-input {
+            display: none;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background: #333;
+            border-radius: 4px;
+            border: 1px solid #ff4444;
+        }
+        .note-followup-input.active { display: block; }
+
+        .note-followup-details {
+            width: 100%;
+            min-height: 60px;
+            padding: 0.5rem;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background: #1a1a1a;
+            color: #fff;
+            font-family: inherit;
+            resize: vertical;
+            margin-bottom: 0.5rem;
+        }
+
+        .note-followup-complete {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .note-followup-complete:hover { background: #16a34a; }
+
+        .note-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
             display: block;
         }
 
-        .note-text {
-            line-height: 1.5;
-            word-wrap: break-word;
+        .note-location {
+            font-size: 0.8rem;
+            color: #ccc;
+            margin-bottom: 0.5rem;
+            padding: 0.25rem;
+            background: #444;
+            border-radius: 4px;
         }
+
+        .follow-up-indicator {
+            color: #ff4444;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .follow-up-details {
+            background: #333;
+            padding: 0.75rem;
+            border-left: 3px solid #ff4444;
+            margin-top: 0.5rem;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .follow-up-timestamp { font-size: 0.8rem; color: #ff4444; margin-bottom: 0.25rem; }
+
+        .note-text { line-height: 1.5; word-wrap: break-word; }
 
         .note-edit {
             width: 100%;
@@ -347,11 +410,7 @@
             border-bottom: 2px solid #ff4444;
         }
 
-        .report-title {
-            font-size: 1.5rem;
-            color: #ff4444;
-            margin-bottom: 1rem;
-        }
+        .report-title { font-size: 1.5rem; color: #ff4444; margin-bottom: 1rem; }
 
         .report-meta {
             display: grid;
@@ -361,9 +420,14 @@
             font-size: 0.9rem;
         }
 
-        .report-notes {
-            margin-top: 2rem;
+        .report-download-time {
+            font-size: 0.8rem;
+            color: #ccc;
+            text-align: right;
+            margin-top: 0.5rem;
         }
+
+        .report-notes { margin-top: 2rem; }
 
         .report-note {
             margin-bottom: 1.5rem;
@@ -371,32 +435,11 @@
             border-bottom: 1px solid #444;
         }
 
-        .report-note:last-child {
-            border-bottom: none;
-        }
+        .report-note:last-child { border-bottom: none; }
 
-        .report-note-time {
-            color: #ff4444;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
+        .report-note-time { color: #ff4444; font-weight: 600; margin-bottom: 0.5rem; }
 
-        .report-actions {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .btn-secondary {
-            background: #444;
-            color: #fff;
-        }
-
-        .btn-secondary:hover {
-            background: #555;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
+        .report-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 
         /* Status Messages */
         .status-message {
@@ -406,23 +449,16 @@
             text-align: center;
             font-weight: 600;
         }
+        .status-success { background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e; color: #22c55e; }
+        .status-error   { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; }
+        .status-info    { background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; color: #3b82f6; }
 
-        .status-success {
-            background: rgba(34, 197, 94, 0.2);
-            border: 1px solid #22c55e;
-            color: #22c55e;
-        }
-
-        .status-error {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid #ef4444;
-            color: #ef4444;
-        }
-
-        .status-info {
-            background: rgba(59, 130, 246, 0.2);
-            border: 1px solid #3b82f6;
-            color: #3b82f6;
+        /* Print Styles */
+        @media print {
+            body { background: white; color: black; }
+            .tab-nav, .btn, .notes-controls { display: none; }
+            .report-preview { background: white; border: none; max-height: none; }
+            .report-meta { grid-template-columns: 1fr 1fr 1fr 1fr; }
         }
 
         /* Responsive Design */
@@ -434,13 +470,9 @@
                 border-right: 1px solid #444;
             }
 
-            .report-meta {
-                grid-template-columns: 1fr 1fr 1fr;
-            }
+            .report-meta { grid-template-columns: 1fr 1fr 1fr 1fr; }
 
-            .report-actions {
-                justify-content: center;
-            }
+            .report-actions { justify-content: center; }
 
             .btn {
                 width: auto;
@@ -448,26 +480,14 @@
             }
         }
 
-        /* Touch-friendly sizing */
+        /* Touch-friendly */
         @media (max-width: 767px) {
-            .tab-btn {
-                padding: 1.2rem 0.5rem;
-                font-size: 0.8rem;
-            }
-
-            .btn, .voice-btn {
-                padding: 1rem;
-                font-size: 1.1rem;
-            }
-
-            .note-header {
-                padding: 1rem;
-            }
-
-            .note-action-btn {
-                padding: 0.5rem;
-                font-size: 1rem;
-            }
+            .tab-btn { padding: 1.2rem 0.5rem; font-size: 0.8rem; }
+            .btn, .voice-btn, .photo-btn { padding: 1rem; font-size: 1.1rem; }
+            .note-header { padding: 1rem; }
+            .note-action-btn { padding: 0.5rem; font-size: 1rem; }
+            .input-row { flex-direction: column; align-items: stretch; }
+            .voice-btn, .photo-btn { flex: none; }
         }
     </style>
 </head>
@@ -475,7 +495,6 @@
     <div class="container">
         <!-- Header -->
         <header class="header">
-            <div class="logo">IDP</div>
             <h1>Incident Diary Pro</h1>
             <div class="incident-info" id="incidentInfo">
                 Incident Logger - Set up your incident details
@@ -500,31 +519,29 @@
             <form class="setup-form" id="setupForm">
                 <div class="form-group">
                     <label for="authorName">Author Name *</label>
-                    <input type="text" id="authorName" name="authorName" required 
-                           placeholder="Enter your full name" autocomplete="name">
+                    <input type="text" id="authorName" name="authorName" required placeholder="Enter your full name" autocomplete="name" />
                 </div>
-                
+
                 <div class="form-group">
-                    <label for="incidentNumber">Incident Number *</label>
-                    <input type="text" id="incidentNumber" name="incidentNumber" required 
-                           placeholder="e.g 621223" autocomplete="off">
+                    <label for="incidentNumber">Incident Number</label>
+                    <input type="text" id="incidentNumber" name="incidentNumber" placeholder="e.g 621223" autocomplete="off" />
+                    <div class="no-incident-checkbox">
+                        <input type="checkbox" id="noIncidentCheckbox" />
+                        <label for="noIncidentCheckbox">No Incident Number</label>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="dfesId">DFES ID Number *</label>
-                    <input type="text" id="dfesId" name="dfesId" required 
-                           placeholder="e.g., 123456" autocomplete="off">
+                    <input type="text" id="dfesId" name="dfesId" required placeholder="e.g., 123456" autocomplete="off" />
                 </div>
-                
+
                 <div class="form-group">
                     <label for="userRole">Your Role *</label>
-                    <input type="text" id="userRole" name="userRole" required 
-                           placeholder="e.g., RDC, IC, OO, PO, PIO, LO" autocomplete="organization-title">
+                    <input type="text" id="userRole" name="userRole" required placeholder="e.g., RDC, IC, OO, PO, PIO, LO" autocomplete="organization-title" />
                 </div>
-                
-                <button type="submit" class="btn" id="submitBtn">
-                    Start Logging Notes
-                </button>
+
+                <button type="submit" class="btn" id="submitBtn">Start Logging Notes</button>
             </form>
             <div id="setupStatus" class="status-message" style="display: none;"></div>
         </main>
@@ -532,28 +549,26 @@
         <!-- Notes Tab -->
         <main class="tab-content" id="notes-tab" role="tabpanel" aria-labelledby="notes-btn">
             <div class="notes-controls">
-                <!-- Note Input -->
                 <div class="note-input-container">
-                    <textarea class="note-input" id="noteInput" 
-                              placeholder="Enter your note here..." 
-                              aria-label="Note content"></textarea>
-                    
-                    <div class="voice-controls">
-                        <button class="voice-btn" id="voiceBtn" aria-label="Start voice recording">
-                            🎤 Voice
-                        </button>
-                        <button class="btn" id="addNoteBtn">
-                            Add Note
-                        </button>
+                    <textarea class="note-input" id="noteInput" placeholder="Enter your note here..." aria-label="Note content"></textarea>
+
+                    <div class="input-row">
+                        <button class="voice-btn" id="voiceBtn" aria-label="Start voice recording">🎤 Voice</button>
+                        <input type="file" id="photoInput" accept="image/*" capture="environment" style="display: none;" aria-label="Take photo" />
+                        <button class="photo-btn" id="photoBtn" aria-label="Take photo">📸 Photo</button>
+                        <button class="btn" id="addNoteBtn">Add Note</button>
+                    </div>
+
+                    <div class="follow-up-input">
+                        <input type="checkbox" id="followUpCheckbox" />
+                        <label for="followUpCheckbox">Requires Follow Up</label>
                     </div>
                 </div>
 
                 <div id="voiceStatus" class="status-message" style="display: none;"></div>
 
-                <!-- Search (moved under Add Note section) -->
                 <div class="search-container">
-                    <input type="text" class="search-input" id="searchInput" 
-                           placeholder="Search notes by keyword..." aria-label="Search notes">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search notes by keyword..." aria-label="Search notes" />
                     <button class="search-clear" id="searchClear" aria-label="Clear search">×</button>
                 </div>
             </div>
@@ -568,83 +583,61 @@
             <div class="report-preview" id="reportPreview">
                 <div class="status-message status-info">Complete setup and add notes to generate a report.</div>
             </div>
-            
+
             <div class="report-actions">
-                <button class="btn" id="downloadTxtBtn" disabled>
-                    📄 Download TXT
-                </button>
-                <button class="btn btn-secondary" id="downloadHtmlBtn" disabled>
-                    🌐 Download HTML
-                </button>
-                <button class="btn btn-secondary" id="emailBtn" disabled>
-                    📧 Email Report
-                </button>
-                <button class="btn btn-secondary" id="clearDataBtn">
-                    🗑️ Clear All Data
-                </button>
+                <!-- Removed: Download TXT and Download HTML -->
+                <button class="btn btn-secondary" id="downloadPdfBtn" disabled>🖨️ Print to PDF</button>
+                <button class="btn btn-secondary" id="emailPdfBtn" disabled>📧 Email PDF (Manual)</button>
+                <button class="btn btn-secondary" id="emailBtn" disabled>📧 Email Report</button>
+                <button class="btn btn-danger" id="clearDataBtn">🗑️ Clear All Data</button>
             </div>
         </main>
     </div>
 
     <script>
-        console.log('Incident Diary Pro script starting...');
-
-        // Application State
+        // In-memory state (no localStorage)
         let appState = {
             author: '',
             incidentNumber: '',
+            noIncident: false,
             dfesId: '',
             role: '',
             notes: [],
             currentTab: 'setup',
             isRecording: false,
-            recognition: null
+            recognition: null,
+            voiceTranscript: ''
         };
 
-        // Safe DOM getter
         function getElement(id) {
             const el = document.getElementById(id);
-            if (!el) {
-                console.error(`Element with ID '${id}' not found.`);
-            }
+            if (!el) console.error(`Element with ID '${id}' not found.`);
             return el;
         }
 
-        // Initialize Application
         function init() {
-            console.log('Initializing Incident Diary Pro...');
-            try {
-                loadData();
-                setupEventListeners();
-                setupSpeechRecognition();
-                updateUI();
-                console.log('Initialization complete.');
-            } catch (error) {
-                console.error('Initialization error:', error);
-                showStatus('setupStatus', 'Error loading app. Please refresh.', 'error');
-            }
+            setupEventListeners();
+            setupSpeechRecognition();
+            updateUI();
         }
 
-        // Event Listeners Setup
         function setupEventListeners() {
-            console.log('Setting up event listeners...');
-
-            // Tab navigation
+            // Tabs
             getElement('setup-btn').addEventListener('click', () => switchTab('setup'));
             getElement('notes-btn').addEventListener('click', () => switchTab('notes'));
             getElement('report-btn').addEventListener('click', () => switchTab('report'));
 
-            // Setup form
+            // Setup
             getElement('setupForm').addEventListener('submit', handleSetupSubmit);
+            getElement('noIncidentCheckbox').addEventListener('change', handleNoIncidentChange);
 
-            // Notes functionality
+            // Notes
             getElement('addNoteBtn').addEventListener('click', addNote);
             getElement('voiceBtn').addEventListener('click', toggleVoiceRecording);
+            getElement('photoBtn').addEventListener('click', () => getElement('photoInput').click());
+            getElement('photoInput').addEventListener('change', handlePhotoUpload);
             getElement('noteInput').addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-                    e.preventDefault();
-                    addNote();
-                }
+                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); addNote(); }
             });
 
             // Search
@@ -652,216 +645,220 @@
             getElement('searchClear').addEventListener('click', clearSearch);
 
             // Report actions
-            getElement('downloadTxtBtn').addEventListener('click', downloadTxtReport);
-            getElement('downloadHtmlBtn').addEventListener('click', downloadHtmlReport);
+            getElement('downloadPdfBtn').addEventListener('click', printToPdf);
+            getElement('emailPdfBtn').addEventListener('click', emailPdfInstructions);
             getElement('emailBtn').addEventListener('click', emailReport);
             getElement('clearDataBtn').addEventListener('click', clearAllData);
 
-            // Auto-save on input (setup form) - added dfesId
-            ['authorName', 'incidentNumber', 'dfesId', 'userRole'].forEach(id => {
-                const el = getElement(id);
-                if (el) el.addEventListener('input', saveData);
-            });
-
-            // Event delegation for notes list (handles clicks on dynamic elements)
+            // Notes list delegation
             getElement('notesList').addEventListener('click', handleNotesListClick);
-
-            console.log('Event listeners set up.');
         }
 
-        // Event delegation for notes interactions
-        function handleNotesListClick(e) {
-            const target = e.target;
-            const noteItem = target.closest('.note-item');
-            if (!noteItem) return;
-
-            const noteId = parseInt(noteItem.dataset.noteId);
-
-            if (target.classList.contains('note-header') || target.closest('.note-header')) {
-                toggleNoteExpansion(noteId);
-            } else if (target.matches('.edit-btn')) {
-                editNoteInline(noteId);
-            } else if (target.matches('.delete-btn')) {
-                deleteNote(noteId);
-            } else if (target.matches('.save-edit-btn')) {
-                const textarea = target.previousElementSibling.querySelector('textarea');
-                const newText = textarea ? textarea.value.trim() : '';
-                saveNoteEdit(noteId, newText);
-            } else if (target.matches('.cancel-edit-btn')) {
-                cancelNoteEdit(noteId);
+        function handleNoIncidentChange(e) {
+            const incidentInput = getElement('incidentNumber');
+            appState.noIncident = e.target.checked;
+            if (incidentInput) {
+                incidentInput.required = !appState.noIncident;
+                incidentInput.disabled = appState.noIncident;
+                if (appState.noIncident) incidentInput.value = '';
             }
         }
 
-        // Speech Recognition Setup
+        // Speech recognition
         function setupSpeechRecognition() {
             if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                console.log('Speech recognition not supported.');
                 const voiceBtn = getElement('voiceBtn');
                 if (voiceBtn) {
                     voiceBtn.disabled = true;
                     voiceBtn.textContent = '🎤 Not Supported';
-                    voiceBtn.title = 'Speech recognition not supported in this browser';
+                    voiceBtn.title = 'Speech recognition not supported';
                 }
                 return;
             }
-
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             appState.recognition = new SpeechRecognition();
-
-            appState.recognition.continuous = false; // Simplified for reliability
-            appState.recognition.interimResults = false;
+            appState.recognition.continuous = true;
+            appState.recognition.interimResults = true;
             appState.recognition.lang = 'en-US';
 
             appState.recognition.onstart = () => {
                 appState.isRecording = true;
+                appState.voiceTranscript = '';
                 const btn = getElement('voiceBtn');
-                if (btn) {
-                    btn.classList.add('recording');
-                    btn.textContent = '🔴 Stop';
-                }
+                btn.classList.add('recording');
+                btn.textContent = '🔴 Recording...';
                 showStatus('voiceStatus', 'Listening... Speak now', 'info');
+                getElement('noteInput').value = '';
             };
 
             appState.recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                const noteInput = getElement('noteInput');
-                if (noteInput && transcript) {
-                    noteInput.value += (noteInput.value ? ' ' : '') + transcript;
-                    showStatus('voiceStatus', 'Voice input added!', 'success');
+                let interimTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) appState.voiceTranscript += transcript + ' ';
+                    else interimTranscript += transcript;
                 }
+                if (interimTranscript) showStatus('voiceStatus', `Interim: ${interimTranscript}`, 'info');
             };
 
             appState.recognition.onerror = (event) => {
-                console.error('Speech error:', event.error);
-                showStatus('voiceStatus', `Voice error: ${event.error}`, 'error');
+                showStatus('voiceStatus', `Error: ${event.error}`, 'error');
                 stopVoiceRecording();
             };
 
             appState.recognition.onend = () => {
+                if (appState.voiceTranscript.trim()) {
+                    getElement('noteInput').value = appState.voiceTranscript.trim();
+                    showStatus('voiceStatus', 'Transcript ready for review!', 'success');
+                }
                 stopVoiceRecording();
             };
-
-            console.log('Speech recognition set up.');
         }
 
-        // Voice Functions
         function toggleVoiceRecording() {
-            if (appState.isRecording) {
-                stopVoiceRecording();
-            } else {
-                startVoiceRecording();
-            }
+            if (appState.isRecording) appState.recognition.stop();
+            else startVoiceRecording();
         }
 
         function startVoiceRecording() {
             if (appState.recognition && !appState.isRecording) {
-                try {
-                    appState.recognition.start();
-                } catch (error) {
-                    console.error('Failed to start recording:', error);
-                    showStatus('voiceStatus', 'Could not start voice recognition', 'error');
-                }
+                try { appState.recognition.start(); }
+                catch { showStatus('voiceStatus', 'Could not start recording', 'error'); }
             }
         }
 
         function stopVoiceRecording() {
-            if (appState.recognition && appState.isRecording) {
-                appState.recognition.stop();
-            }
+            if (appState.recognition && appState.isRecording) appState.recognition.stop();
             appState.isRecording = false;
             const btn = getElement('voiceBtn');
-            if (btn) {
-                btn.classList.remove('recording');
-                btn.textContent = '🎤 Voice';
-            }
+            btn.classList.remove('recording');
+            btn.textContent = '🎤 Voice';
             setTimeout(() => hideStatus('voiceStatus'), 3000);
         }
 
-        // Tab Management
+        // Photo + geo
+        function handlePhotoUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            showStatus('voiceStatus', 'Processing photo...', 'info');
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => createPhotoNote(file, {
+                        lat: pos.coords.latitude.toFixed(6),
+                        lng: pos.coords.longitude.toFixed(6)
+                    }),
+                    () => createPhotoNote(file, null),
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+                );
+            } else {
+                createPhotoNote(file, null);
+            }
+        }
+
+        function createPhotoNote(file, location) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const note = {
+                    id: Date.now(),
+                    timestamp: new Date(),
+                    text: `[Photo Note - Location: ${location ? `${location.lat}, ${location.lng}` : 'Location unavailable'}]`,
+                    author: appState.author,
+                    image: e.target.result,
+                    location,
+                    followUp: false,
+                    followUpDetails: '',
+                    followUpTimestamp: null
+                };
+                appState.notes.unshift(note);
+                renderNotes();
+                getElement('photoInput').value = '';
+                showStatus('voiceStatus', 'Photo note added!', 'success');
+                setTimeout(() => hideStatus('voiceStatus'), 2000);
+            };
+            reader.onerror = () => showStatus('voiceStatus', 'Error reading photo', 'error');
+            reader.readAsDataURL(file);
+        }
+
+        // Tabs
         function switchTab(tabName) {
-            console.log('Switching to tab:', tabName);
             if (tabName !== 'setup' && !isSetupComplete()) {
-                showStatus('voiceStatus', 'Please complete setup first', 'error');
+                const statusId = tabName === 'notes' ? 'setupStatus' : 'voiceStatus';
+                showStatus(statusId, 'Please complete setup first', 'error');
                 return;
             }
-
             appState.currentTab = tabName;
 
-            // Update buttons
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 const isActive = btn.id === `${tabName}-btn`;
                 btn.classList.toggle('active', isActive);
                 btn.setAttribute('aria-selected', isActive);
-                btn.disabled = false; // Enable all after setup
+                if (btn.id !== 'setup-btn') btn.disabled = !isSetupComplete();
             });
 
-            // Update content
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.toggle('active', content.id === `${tabName}-tab`);
             });
 
-            if (tabName === 'notes') {
-                renderNotes();
-            } else if (tabName === 'report') {
-                generateReport();
-            }
-
-            saveData();
+            if (tabName === 'notes') renderNotes();
+            else if (tabName === 'report') generateReport();
         }
 
-        // Setup Handling
+        // Setup
         function handleSetupSubmit(e) {
             e.preventDefault();
-            console.log('Setup submitted.');
+            appState.author = getElement('authorName').value.trim();
+            appState.incidentNumber = getElement('incidentNumber').value.trim();
+            appState.noIncident = getElement('noIncidentCheckbox').checked;
+            appState.dfesId = getElement('dfesId').value.trim();
+            appState.role = getElement('userRole').value.trim();
 
-            try {
-                appState.author = getElement('authorName').value.trim();
-                appState.incidentNumber = getElement('incidentNumber').value.trim();
-                appState.dfesId = getElement('dfesId').value.trim();
-                appState.role = getElement('userRole').value.trim();
-
-                if (appState.author && appState.incidentNumber && appState.dfesId && appState.role) {
-                    updateIncidentInfo();
-                    saveData();
-                    switchTab('notes');
-                    getElement('noteInput').focus();
-                    showStatus('setupStatus', 'Setup complete! Start adding notes.', 'success');
-                    setTimeout(() => hideStatus('setupStatus'), 3000);
-                } else {
-                    showStatus('setupStatus', 'Please fill all fields.', 'error');
-                }
-            } catch (error) {
-                console.error('Setup error:', error);
-                showStatus('setupStatus', 'Error saving setup.', 'error');
+            if (isSetupComplete()) {
+                updateIncidentInfo();
+                switchTab('notes');
+                getElement('noteInput').focus();
+                showStatus('setupStatus', 'Setup complete!', 'success');
+                setTimeout(() => hideStatus('setupStatus'), 3000);
+            } else {
+                showStatus('setupStatus', 'Please fill all required fields.', 'error');
             }
         }
 
         function isSetupComplete() {
-            return appState.author && appState.incidentNumber && appState.dfesId && appState.role;
+            return Boolean(
+                appState.author &&
+                appState.dfesId &&
+                appState.role &&
+                (appState.noIncident || appState.incidentNumber)
+            );
         }
 
         function updateIncidentInfo() {
-            const infoEl = getElement('incidentInfo');
-            if (infoEl) {
-                infoEl.textContent = `${appState.incidentNumber} | DFES ID: ${appState.dfesId} | ${appState.author} (${appState.role})`;
-            }
+            const incNum = appState.noIncident ? 'No Incident Number' : appState.incidentNumber;
+            getElement('incidentInfo').textContent = `${incNum} | DFES ID: ${appState.dfesId} | ${appState.author} (${appState.role})`;
         }
 
-        // Notes Management
+        // Notes
+        // Only allow follow up if "Requires Follow Up" was ticked at creation.
         function addNote() {
             const noteText = getElement('noteInput').value.trim();
+            const followUpChecked = getElement('followUpCheckbox').checked;
             if (!noteText) return;
 
             const note = {
                 id: Date.now(),
                 timestamp: new Date(),
                 text: noteText,
-                author: appState.author
+                author: appState.author,
+                followUp: followUpChecked,
+                followUpDetails: '',
+                followUpTimestamp: null,
+                image: null,
+                location: null
             };
 
             appState.notes.unshift(note);
             getElement('noteInput').value = '';
-            saveData();
+            getElement('followUpCheckbox').checked = false;
             renderNotes();
             showStatus('voiceStatus', 'Note added!', 'success');
             setTimeout(() => hideStatus('voiceStatus'), 2000);
@@ -869,8 +866,7 @@
 
         function deleteNote(noteId) {
             if (confirm('Delete this note?')) {
-                appState.notes = appState.notes.filter(note => note.id !== noteId);
-                saveData();
+                appState.notes = appState.notes.filter(n => n.id !== noteId);
                 renderNotes();
             }
         }
@@ -879,39 +875,75 @@
             const note = appState.notes.find(n => n.id === noteId);
             if (note && newText.trim()) {
                 note.text = newText.trim();
-                note.lastModified = new Date();
-                saveData();
-                renderNotes();
+                renderNotes(getElement('searchInput').value.toLowerCase());
+            }
+        }
+
+        function completeFollowUp(noteId) {
+            const note = appState.notes.find(n => n.id === noteId);
+            if (!note) return;
+            if (!note.followUp) {
+                showStatus('voiceStatus', 'Follow up not allowed for this note.', 'error');
+                return;
+            }
+            const detailsEl = document.querySelector(`#followup-input-${noteId} .note-followup-details`);
+            if (detailsEl) {
+                note.followUpDetails = detailsEl.value.trim();
+                note.followUpTimestamp = new Date();
+                detailsEl.value = '';
+                renderNotes(getElement('searchInput').value.toLowerCase());
+                showStatus('voiceStatus', 'Follow up completed!', 'success');
+                setTimeout(() => hideStatus('voiceStatus'), 2000);
+            }
+        }
+
+        function toggleNoteFollowUp(noteId, checkbox) {
+            const note = appState.notes.find(n => n.id === noteId);
+            if (!note) return;
+            if (!note.followUp) {
+                checkbox.checked = false;
+                showStatus('voiceStatus', 'Follow up not allowed for this note.', 'error');
+                return;
+            }
+            const inputContainer = document.getElementById(`followup-input-${noteId}`);
+            if (!inputContainer) return;
+            const ta = inputContainer.querySelector('textarea');
+            if (checkbox.checked) {
+                inputContainer.classList.add('active');
+                if (ta) ta.focus();
+            } else {
+                inputContainer.classList.remove('active');
+                if (ta) ta.value = '';
             }
         }
 
         function toggleNoteExpansion(noteId) {
-            const content = document.querySelector(`#note-content-${noteId}`);
-            if (content) {
-                content.classList.toggle('expanded');
-            }
+            const content = document.getElementById(`note-content-${noteId}`);
+            if (content) content.classList.toggle('expanded');
         }
 
         function editNoteInline(noteId) {
             const textEl = document.getElementById(`note-text-${noteId}`);
             if (!textEl) return;
-
-            const originalText = appState.notes.find(n => n.id === noteId).text;
+            const note = appState.notes.find(n => n.id === noteId);
+            const originalText = note ? note.text : '';
             textEl.innerHTML = `
-                <textarea class="note-edit" id="edit-${noteId}">${originalText}</textarea>
-                <div style="margin-top: 0.5rem;">
-                    <button class="btn save-edit-btn" style="width: auto; margin-right: 0.5rem;">Save</button>
-                    <button class="btn btn-secondary cancel-edit-btn" style="width: auto;">Cancel</button>
+                <textarea class="note-edit" id="edit-${noteId}">${escapeHtml(originalText)}</textarea>
+                <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <button class="btn save-edit-btn" data-action="save-edit" style="width: auto;">Save</button>
+                    <button class="btn btn-secondary cancel-edit-btn" data-action="cancel-edit" style="width: auto;">Cancel</button>
                 </div>
             `;
-            document.getElementById(`edit-${noteId}`).focus();
+            const ta = document.getElementById(`edit-${noteId}`);
+            if (ta) ta.focus();
         }
 
-        function saveNoteEdit(noteId, newText) {
-            editNote(noteId, newText);
+        function saveNoteEdit(noteId) {
+            const textarea = document.getElementById(`edit-${noteId}`);
+            if (textarea) editNote(noteId, textarea.value.trim());
         }
 
-        function cancelNoteEdit(noteId) {
+        function cancelNoteEdit() {
             renderNotes(getElement('searchInput').value.toLowerCase());
         }
 
@@ -929,17 +961,19 @@
         }
 
         function highlightSearchTerm(text, searchTerm) {
-            if (!searchTerm) return text;
+            const safe = escapeHtml(text || '');
+            if (!searchTerm) return safe;
             const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-            return text.replace(regex, '<mark style="background: #ff4444; color: white; padding: 0 2px;">$1</mark>');
+            return safe.replace(regex, '<mark style="background: #ff4444; color: white; padding: 0 2px;">$1</mark>');
         }
 
-        // Render Notes (notes are now expanded by default)
+        // Render notes
         function renderNotes(searchTerm = '') {
             let filteredNotes = appState.notes;
             if (searchTerm) {
-                filteredNotes = appState.notes.filter(note => 
-                    note.text.toLowerCase().includes(searchTerm)
+                filteredNotes = appState.notes.filter(note =>
+                    (note.text || '').toLowerCase().includes(searchTerm) ||
+                    (note.followUpDetails && note.followUpDetails.toLowerCase().includes(searchTerm))
                 );
             }
 
@@ -947,139 +981,234 @@
             if (!listEl) return;
 
             if (filteredNotes.length === 0) {
-                listEl.innerHTML = searchTerm ? 
-                    '<div class="status-message status-info">No notes found.</div>' :
-                    '<div class="status-message status-info">No notes yet. Add your first note above!</div>';
+                listEl.innerHTML = searchTerm
+                    ? '<div class="status-message status-info">No notes found.</div>'
+                    : '<div class="status-message status-info">No notes yet. Add your first note above!</div>';
                 return;
             }
 
             listEl.innerHTML = filteredNotes.map(note => {
-                const formattedTime = formatTimestamp(note.timestamp, 'notes'); // 12hr for notes list
+                const formattedTime = formatTimestamp(note.timestamp);
                 const highlightedText = highlightSearchTerm(note.text, searchTerm);
-                const isHighlighted = searchTerm && note.text.toLowerCase().includes(searchTerm);
-                
-                return `
+                const isHighlighted = !!searchTerm &&
+                    ((note.text || '').toLowerCase().includes(searchTerm) ||
+                     (note.followUpDetails && note.followUpDetails.toLowerCase().includes(searchTerm)));
+
+                let followupControls = '';
+                if (note.followUp) {
+                    if (!note.followUpDetails) {
+                        followupControls = `
+                            <div class="note-followup-controls">
+                                <input type="checkbox" class="note-followup-checkbox" id="followup-check-${note.id}" data-action="toggle-followup">
+                                <label for="followup-check-${note.id}">Follow Up</label>
+                            </div>
+                            <div class="note-followup-input" id="followup-input-${note.id}">
+                                <textarea class="note-followup-details" placeholder="Enter follow up details..."></textarea>
+                                <button class="note-followup-complete" data-action="complete-followup">Complete</button>
+                            </div>
+                        `;
+                    } else {
+                        followupControls = `<div class="follow-up-indicator">🔄 Follow Up Completed</div>`;
+                    }
+                }
+
+                let noteHtml = `
                     <div class="note-item ${isHighlighted ? 'highlight' : ''}" data-note-id="${note.id}">
-                        <div class="note-header">
+                        <div class="note-header" data-action="toggle-expand">
                             <div class="note-timestamp">${formattedTime}</div>
                             <div class="note-actions">
-                                <button class="note-action-btn edit-btn" aria-label="Edit" title="Edit">✏️</button>
-                                <button class="note-action-btn delete-btn" aria-label="Delete" title="Delete">🗑️</button>
+                                <button class="note-action-btn edit-btn" data-action="edit-note" aria-label="Edit" title="Edit">✏️</button>
+                                <button class="note-action-btn delete-btn" data-action="delete-note" aria-label="Delete" title="Delete">🗑️</button>
                             </div>
                         </div>
                         <div class="note-content" id="note-content-${note.id}">
-                            <div class="note-text" id="note-text-${note.id}">${highlightedText}</div>
-                        </div>
-                    </div>
-                `;
+                            ${followupControls ? `<div class="note-followup-header">${followupControls}</div>` : ''}
+                            <div class="note-text" id="note-text-${note.id}">${highlightedText}</div>`;
+
+                if (note.image) {
+                    noteHtml += `<img src="${note.image}" alt="Geo-referenced photo" class="note-image">`;
+                    if (note.location) {
+                        noteHtml += `<div class="note-location">📍 Lat: ${note.location.lat}, Lng: ${note.location.lng}</div>`;
+                    }
+                }
+
+                if (note.followUp && note.followUpDetails) {
+                    const fuTime = formatTimestamp(note.followUpTimestamp);
+                    noteHtml += `<div class="follow-up-details">
+                        <div class="follow-up-timestamp">${fuTime}</div>
+                        <div>${escapeHtml(note.followUpDetails)}</div>
+                    </div>`;
+                }
+
+                noteHtml += `</div></div>`;
+                return noteHtml;
             }).join('');
         }
 
-        // Report Generation (updated with DFES ID)
+        // Report
         function generateReport() {
             const previewEl = getElement('reportPreview');
             if (!previewEl) return;
 
             if (!isSetupComplete() || appState.notes.length === 0) {
                 previewEl.innerHTML = '<div class="status-message status-info">Add notes to generate report.</div>';
+                setReportButtonsEnabled(false);
                 return;
             }
 
-            const reportDate = new Date().toLocaleDateString();
+            const reportDate = new Date().toLocaleDateString('en-GB');
+            const downloadTime = formatTimestamp(new Date(), true);
             const totalNotes = appState.notes.length;
+            const incNum = appState.noIncident ? 'No set Incident Number' : appState.incidentNumber;
+
+            const notesHtml = appState.notes.slice().reverse().map((note) => {
+                const time = formatTimestamp(note.timestamp);
+                let content = `<div class="report-note">
+                    <div class="report-note-time">${time}</div>
+                    <div class="note-text">${escapeHtml(note.text)}</div>`;
+                if (note.image) {
+                    content += `<img src="${note.image}" alt="Photo" style="max-width: 100%; height: auto; margin: 0.5rem 0;">`;
+                    if (note.location) {
+                        content += `<div style="font-size: 0.9rem; color: #ff4444;">📍 Location: ${note.location.lat}, ${note.location.lng}</div>`;
+                    }
+                }
+                if (note.followUp) {
+                    content += `<div style="color: #ff4444; font-weight: 600; margin-top: 0.5rem;">🔄 Follow Up Required</div>`;
+                    if (note.followUpDetails) {
+                        const fuTime = formatTimestamp(note.followUpTimestamp);
+                        content += `<div style="margin-top: 0.5rem; padding: 0.5rem; background: #333; border-left: 3px solid #ff4444;">
+                            <div style="font-size: 0.9rem;">${fuTime}</div>
+                            <div>${escapeHtml(note.followUpDetails)}</div>
+                        </div>`;
+                    }
+                }
+                return content + '</div>';
+            }).join('');
 
             previewEl.innerHTML = `
                 <div class="report-header">
                     <h2 class="report-title">Incident Report</h2>
                     <div class="report-meta">
-                        <div><strong>Incident:</strong> ${appState.incidentNumber}</div>
+                        <div><strong>Incident:</strong> ${incNum}</div>
                         <div><strong>DFES ID:</strong> ${appState.dfesId}</div>
                         <div><strong>Author:</strong> ${appState.author}</div>
                         <div><strong>Role:</strong> ${appState.role}</div>
                         <div><strong>Date:</strong> ${reportDate}</div>
                         <div><strong>Total Notes:</strong> ${totalNotes}</div>
                     </div>
+                    <div class="report-download-time">Report Generated: ${downloadTime}</div>
                 </div>
                 <div class="report-notes">
                     <h3 style="color: #ff4444; margin-bottom: 1rem;">Incident Notes</h3>
-                    ${appState.notes.slice().reverse().map((note) => `
-                        <div class="report-note">
-                            <div class="report-note-time">${formatTimestamp(note.timestamp, 'report')}</div>
-                            <div class="note-text">${escapeHtml(note.text)}</div>
-                        </div>
-                    `).join('')}
+                    ${notesHtml}
                 </div>
             `;
 
-            // Enable download buttons
-            ['downloadTxtBtn', 'downloadHtmlBtn', 'emailBtn'].forEach(id => {
+            setReportButtonsEnabled(true);
+        }
+
+        function setReportButtonsEnabled(enabled) {
+            ['downloadPdfBtn', 'emailPdfBtn', 'emailBtn'].forEach(id => {
                 const btn = getElement(id);
-                if (btn) btn.disabled = false;
+                if (btn) btn.disabled = !enabled;
             });
         }
 
-        // Export Functions (updated for DFES ID)
-        function downloadTxtReport() {
-            const content = generateTextReport();
-            downloadFile(content, `incident-report-${appState.incidentNumber}.txt`, 'text/plain');
+        // Export/Share
+        function printToPdf() {
+            const printWindow = window.open('', '_blank');
+            const incNum = appState.noIncident ? 'No set Incident Number' : appState.incidentNumber;
+            const html = generatePrintableHTML(incNum);
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.onload = () => {
+                printWindow.print();
+                printWindow.close();
+            };
         }
 
-        function downloadHtmlReport() {
-            const content = generateHTMLReport();
-            downloadFile(content, `incident-report-${appState.incidentNumber}.html`, 'text/html');
-        }
-
-        function generateTextReport() {
-            let report = `INCIDENT REPORT\n${'='.repeat(50)}\n\n`;
-            report += `Incident: ${appState.incidentNumber}\n`;
-            report += `DFES ID: ${appState.dfesId}\n`;
-            report += `Author: ${appState.author}\n`;
-            report += `Role: ${appState.role}\n`;
-            report += `Date: ${new Date().toLocaleDateString()}\n`;
-            report += `Total Notes: ${appState.notes.length}\n\n`;
-            report += `INCIDENT NOTES\n${'-'.repeat(30)}\n\n`;
-
-            appState.notes.slice().reverse().forEach((note) => {
-                report += `${formatTimestamp(note.timestamp, 'report')}\n${note.text}\n\n`;
-            });
-
-            return report;
-        }
-
-        function generateHTMLReport() {
+        function generatePrintableHTML(incNum) {
+            const downloadTime = formatTimestamp(new Date(), true);
             return `
                 <!DOCTYPE html>
-                <html><head><title>Incident Report - ${appState.incidentNumber}</title>
-                <style>body{font-family:Arial;max-width:800px;margin:20px auto;padding:20px;}
-                h2{color:#cc3333;} .meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-                .note{margin-bottom:20px;border-bottom:1px solid #ccc;padding-bottom:10px;}
-                .time{color:#cc3333;font-weight:bold;}</style></head>
+                <html>
+                <head>
+                    <meta charset="utf-8" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+                    <title>Incident Report PDF - ${incNum}</title>
+                    <style>
+                        @media print { body { margin: 0; } }
+                        body { font-family: Arial, Helvetica, sans-serif; padding: 20px; }
+                        h2 { color: #cc3333; }
+                        .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+                        .note { margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px; page-break-inside: avoid; }
+                        .time { color: #cc3333; font-weight: bold; }
+                        img { max-width: 100%; height: auto; }
+                        .follow-up { color: #cc3333; font-weight: bold; }
+                    </style>
+                </head>
                 <body>
                     <h2>Incident Report</h2>
                     <div class="meta">
-                        <div><strong>Incident:</strong> ${appState.incidentNumber}</div>
+                        <div><strong>Incident:</strong> ${incNum}</div>
                         <div><strong>DFES ID:</strong> ${appState.dfesId}</div>
                         <div><strong>Author:</strong> ${appState.author}</div>
                         <div><strong>Role:</strong> ${appState.role}</div>
-                        <div><strong>Date:</strong> ${new Date().toLocaleDateString()}</div>
+                        <div><strong>Date:</strong> ${new Date().toLocaleDateString('en-GB')}</div>
                         <div><strong>Total Notes:</strong> ${appState.notes.length}</div>
+                        <div><strong>Downloaded:</strong> ${downloadTime}</div>
                     </div>
-                    <h3 style="color:#cc3333;">Incident Notes</h3>
-                    ${appState.notes.slice().reverse().map((note) => `
-                        <div class="note">
-                            <div class="time">${formatTimestamp(note.timestamp, 'report')}</div>
-                            <p>${escapeHtml(note.text)}</p>
-                        </div>
-                    `).join('')}
-                </body></html>
+                    <h3>Incident Notes</h3>
+                    ${appState.notes.slice().reverse().map((note) => {
+                        const time = formatTimestamp(note.timestamp);
+                        let content = `<div class="note">
+                            <div class="time">${time}</div>
+                            <p>${escapeHtml(note.text)}</p>`;
+                        if (note.image) content += `<img src="${note.image}" alt="Photo">`;
+                        if (note.location) content += `<div>📍 ${note.location.lat}, ${note.location.lng}</div>`;
+                        if (note.followUp) {
+                            content += '<div class="follow-up">Follow Up Required</div>';
+                            if (note.followUpDetails) {
+                                const fuTime = formatTimestamp(note.followUpTimestamp);
+                                content += `<div><strong>${fuTime}</strong><br>${escapeHtml(note.followUpDetails)}</div>`;
+                            }
+                        }
+                        content += '</div>';
+                        return content;
+                    }).join('')}
+                </body>
+                </html>
             `;
         }
 
+        function emailPdfInstructions() {
+            alert('Use "Print to PDF" to generate a PDF, then attach it to your email manually.');
+            printToPdf();
+        }
+
         function emailReport() {
-            const content = generateTextReport();
-            const subject = encodeURIComponent(`Incident Report - ${appState.incidentNumber}`);
-            const body = encodeURIComponent(content);
+            const subject = encodeURIComponent(`Incident Report - ${appState.noIncident ? 'No Number' : appState.incidentNumber}`);
+            const body = encodeURIComponent(generateEmailBody());
             window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        }
+
+        function generateEmailBody() {
+            const incNum = appState.noIncident ? 'No set Incident Number' : appState.incidentNumber;
+            const header = `Incident: ${incNum}\nDFES ID: ${appState.dfesId}\nAuthor: ${appState.author}\nRole: ${appState.role}\nDate: ${new Date().toLocaleDateString('en-GB')}\n\nNotes:\n`;
+            const notes = appState.notes.slice().reverse().map(n => {
+                const t = formatTimestamp(n.timestamp);
+                let s = `- ${t}\n  ${n.text}`;
+                if (n.location) s += `\n  Location: ${n.location.lat}, ${n.location.lng}`;
+                if (n.followUp) {
+                    s += `\n  Follow Up Required`;
+                    if (n.followUpDetails) {
+                        const ft = formatTimestamp(n.followUpTimestamp);
+                        s += `\n  ${ft}\n  ${n.followUpDetails}`;
+                    }
+                }
+                return s;
+            }).join('\n\n');
+            return `${header}${notes}`;
         }
 
         function downloadFile(content, filename, mimeType) {
@@ -1095,82 +1224,43 @@
             URL.revokeObjectURL(url);
         }
 
-        // Data Persistence (updated for DFES ID)
-        function saveData() {
-            try {
-                const data = { ...appState };
-                localStorage.setItem('incidentDiaryProData', JSON.stringify(data));
-            } catch (error) {
-                console.error('Save error:', error);
-            }
-        }
-
-        function loadData() {
-            try {
-                const saved = localStorage.getItem('incidentDiaryProData');
-                if (saved) {
-                    const data = JSON.parse(saved);
-                    appState.author = data.author || '';
-                    appState.incidentNumber = data.incidentNumber || '';
-                    appState.dfesId = data.dfesId || '';
-                    appState.role = data.role || '';
-                    appState.notes = data.notes || [];
-                    appState.currentTab = data.currentTab || 'setup';
-
-                    // Populate form
-                    getElement('authorName').value = appState.author;
-                    getElement('incidentNumber').value = appState.incidentNumber;
-                    getElement('dfesId').value = appState.dfesId;
-                    getElement('userRole').value = appState.role;
-
-                    if (isSetupComplete()) {
-                        updateIncidentInfo();
-                    }
-                }
-            } catch (error) {
-                console.error('Load error:', error);
-            }
-        }
-
         function clearAllData() {
-            if (confirm('Clear all data?')) {
-                localStorage.removeItem('incidentDiaryProData');
-                appState = { author: '', incidentNumber: '', dfesId: '', role: '', notes: [], currentTab: 'setup', isRecording: false, recognition: null };
+            if (confirm('Are you sure you want to reset all data and remove all notes?')) {
+                appState = {
+                    author: '', incidentNumber: '', noIncident: false, dfesId: '',
+                    role: '', notes: [], currentTab: 'setup', isRecording: false,
+                    recognition: appState.recognition, // keep recognition instance if any
+                    voiceTranscript: ''
+                };
                 getElement('setupForm').reset();
+                getElement('noIncidentCheckbox').checked = false;
                 getElement('noteInput').value = '';
                 getElement('searchInput').value = '';
+                getElement('followUpCheckbox').checked = false;
                 getElement('incidentInfo').textContent = 'Incident Logger - Set up your incident details';
                 switchTab('setup');
                 renderNotes();
                 generateReport();
-                showStatus('voiceStatus', 'Data cleared.', 'success');
+                showStatus('voiceStatus', 'All data cleared (not persisted).', 'success');
                 setTimeout(() => hideStatus('voiceStatus'), 2000);
             }
         }
 
-        // Utilities (updated timestamp formats)
-        function formatTimestamp(timestamp, type = 'notes') {
-            const date = new Date(timestamp);
-            if (type === 'report') {
-                // DD/MM/YY HH:mm:ss (24hr)
-                const day = String(date.getDate()).padStart(2, '0');
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const year = String(date.getFullYear()).slice(-2);
-                const hours = String(date.getHours()).padStart(2, '0');
-                const minutes = String(date.getMinutes()).padStart(2, '0');
-                const seconds = String(date.getSeconds()).padStart(2, '0');
-                return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
-            } else {
-                // Keep original 12hr format for notes list
-                return date.toLocaleString('en-US', {
-                    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true
-                });
-            }
+        // Utilities
+        function formatTimestamp(timestamp, forDownload = false) {
+            const date = new Date(timestamp || new Date());
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = String(date.getFullYear()).slice(-2);
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = forDownload ? `:${String(date.getSeconds()).padStart(2, '0')}` : '';
+            return `${day}/${month}/${year} ${hours}:${minutes}${seconds}`;
         }
 
         function escapeHtml(text) {
             const div = document.createElement('div');
-            div.textContent = text;
+            div.textContent = text != null ? String(text) : '';
             return div.innerHTML;
         }
 
@@ -1192,13 +1282,51 @@
             const isComplete = isSetupComplete();
             getElement('notes-btn').disabled = !isComplete;
             getElement('report-btn').disabled = !isComplete;
+            if (isComplete) switchTab(appState.currentTab || 'notes');
+        }
 
-            if (isComplete) {
-                switchTab(appState.currentTab || 'notes');
+        // Delegation
+        function handleNotesListClick(e) {
+            const target = e.target;
+            const noteItem = target.closest('.note-item');
+            if (!noteItem) return;
+            const noteId = parseInt(noteItem.dataset.noteId, 10);
+            const actionEl = target.closest('[data-action]');
+            const action = actionEl ? actionEl.getAttribute('data-action') : null;
+
+            switch (action) {
+                case 'edit-note':
+                    e.stopPropagation();
+                    editNoteInline(noteId);
+                    return;
+                case 'delete-note':
+                    e.stopPropagation();
+                    deleteNote(noteId);
+                    return;
+                case 'toggle-followup':
+                    e.stopPropagation();
+                    toggleNoteFollowUp(noteId, actionEl);
+                    return;
+                case 'complete-followup':
+                    e.stopPropagation();
+                    completeFollowUp(noteId);
+                    return;
+                case 'save-edit':
+                    e.stopPropagation();
+                    saveNoteEdit(noteId);
+                    return;
+                case 'cancel-edit':
+                    e.stopPropagation();
+                    cancelNoteEdit(noteId);
+                    return;
+                case 'toggle-expand':
+                    toggleNoteExpansion(noteId);
+                    return;
+                default:
+                    return;
             }
         }
 
-        // Start the app
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
