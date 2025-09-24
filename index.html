@@ -96,7 +96,6 @@
       background:#eee; border:1px solid #bbb; padding:.3rem .6rem; border-radius:4px; cursor:pointer;
     }
 
-    /* Wider preview to resemble A4 landscape on screen */
     .report-preview {
       background:#fff; color:#000; border-radius:8px; padding:12px; border:1px solid #444;
       max-width: 1300px; margin: 0 auto 1rem; overflow:auto;
@@ -110,7 +109,7 @@
       --grid-cell-size: 13px;
       --grid-border: #666;
       --grid-page-number: #d12a2a;
-      --col-datetime: 140px; /* landscape gives space, keep compact */
+      --col-datetime: 140px; /* compact for more note room */
       --col-from: 130px;
       --col-to: 130px;
       --col-note: auto;
@@ -118,17 +117,25 @@
 
     .dfes-sheet { font-family: var(--grid-font); background:#fff; color:#000; border: 1px solid var(--grid-border); padding: 12px; }
     .dfes-title { text-align:center; font-weight: 800; font-size: var(--grid-title-size); }
-    .dfes-header {
-      display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px;
-      border-bottom: 1px solid var(--grid-border); padding-bottom: 8px; margin-top: 6px; margin-bottom: 8px;
-    }
-    .dfes-page { text-align:right; font-size: var(--grid-label-size); }
-    .dfes-page .num { color: var(--grid-page-number); font-weight: 800; }
 
-    .dfes-meta { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin: 8px 0; }
+    /* Two-row, three-column meta layout (tidy header) */
+    .dfes-meta6 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+      margin: 8px 0 10px 0;
+    }
     .field { border:1px solid var(--grid-border); font-size: var(--grid-label-size); display:grid; grid-template-rows: auto 28px; }
     .field .label { padding: 2px 6px; border-bottom:1px solid var(--grid-border); background:#f6f6f6; }
     .field .value { padding: 4px 6px; font-weight: 600; min-height: 28px; }
+
+    /* Page line sits right, same row as title visually */
+    .dfes-page-row {
+      display:grid; grid-template-columns: 1fr auto; align-items:center;
+      border-bottom: 1px solid var(--grid-border); padding-bottom: 6px; margin-bottom: 6px; margin-top: 6px;
+    }
+    .dfes-page { text-align:right; font-size: var(--grid-label-size); }
+    .dfes-page .num { color: var(--grid-page-number); font-weight: 800; }
 
     .dfes-grid { margin-top: 6px; border: 1px solid var(--grid-border); border-collapse: collapse; width:100%; table-layout: fixed; }
     .dfes-grid th, .dfes-grid td { border:1px solid var(--grid-border); padding: 4px 6px; font-size: var(--grid-cell-size); vertical-align: top; }
@@ -150,7 +157,7 @@
       .tab-btn { padding: 1.1rem .5rem; font-size: .85rem; }
       .btn, .voice-btn { padding: 1rem; font-size: 1.05rem; }
       .tofrom-row { grid-template-columns: 1fr; }
-      .dfes-meta { grid-template-columns: 1fr; }
+      .dfes-meta6 { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -537,7 +544,7 @@
       }).join('');
     }
 
-    // Report generation — A4 landscape pagination and padded page numbers
+    // Report generation — A4 landscape, meta in 2 rows × 3 columns
     function generateReport() {
       const prev = $('reportPreview');
       if (appState.notes.length === 0) {
@@ -565,8 +572,7 @@
       const author = appState.author;
       const role = appState.role;
 
-      // More rows fit in landscape; adjust estimate
-      const rowsPerPage = 22; // each row taller due to columns; tune as needed
+      const rowsPerPage = 22; // landscape estimate
       const pages = [];
       for (let i = 0; i < sourceNotes.length; i += rowsPerPage) {
         pages.push(sourceNotes.slice(i, i + rowsPerPage));
@@ -595,15 +601,18 @@
         return `
           <section class="dfes-sheet" style="${pageIndex < pages.length-1 ? 'page-break-after: always;' : ''}">
             <div class="dfes-title">PERSONAL INCIDENT DIARY</div>
-            <div class="dfes-header">
+
+            <div class="dfes-page-row">
               <div></div>
               <div class="dfes-page">PAGE: <span class="num">${pageNumberPadded}</span></div>
             </div>
 
-            <div class="dfes-meta">
+            <!-- Two rows × three columns -->
+            <div class="dfes-meta6">
               <div class="field"><div class="label">DATE:</div><div class="value">${dateStr}</div></div>
               <div class="field"><div class="label">INCIDENT NAME:</div><div class="value">${incName || '&nbsp;'}</div></div>
               <div class="field"><div class="label">INCIDENT No.:</div><div class="value">${incNumber || '&nbsp;'}</div></div>
+
               <div class="field"><div class="label">NAME:</div><div class="value">${escapeHtml(author)}</div></div>
               <div class="field"><div class="label">ROLE:</div><div class="value">${escapeHtml(role)}</div></div>
               <div class="field"><div class="label">SERVICE No:</div><div class="value">${escapeHtml(dfesId)}</div></div>
