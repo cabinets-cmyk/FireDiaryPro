@@ -106,32 +106,22 @@
       --grid-cell-size: 13px;
       --grid-border: #666;
       --grid-page-number: #d12a2a;
-      /* Slimmer columns for more note room */
-      --col-datetime: 120px; /* reduced */
-      --col-from: 120px;     /* reduced */
-      --col-to: 120px;       /* reduced */
+      --col-datetime: 120px; /* compact for more note room */
+      --col-from: 120px;
+      --col-to: 120px;
       --col-note: auto;
     }
 
     .dfes-sheet { font-family: var(--grid-font); background:#fff; color:#000; border: 1px solid var(--grid-border); padding: 12px; }
     .dfes-title { text-align:center; font-weight: 800; font-size: var(--grid-title-size); }
     .dfes-header {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: center;
-      gap: 8px;
-      border-bottom: 1px solid var(--grid-border);
-      padding-bottom: 8px; margin-top: 6px; margin-bottom: 8px;
+      display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px;
+      border-bottom: 1px solid var(--grid-border); padding-bottom: 8px; margin-top: 6px; margin-bottom: 8px;
     }
     .dfes-page { text-align:right; font-size: var(--grid-label-size); }
     .dfes-page .num { color: var(--grid-page-number); font-weight: 800; }
 
-    .dfes-meta {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 6px;
-      margin: 8px 0;
-    }
+    .dfes-meta { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin: 8px 0; }
     .field { border:1px solid var(--grid-border); font-size: var(--grid-label-size); display:grid; grid-template-rows: auto 28px; }
     .field .label { padding: 2px 6px; border-bottom:1px solid var(--grid-border); background:#f6f6f6; }
     .field .value { padding: 4px 6px; font-weight: 600; min-height: 28px; }
@@ -144,13 +134,12 @@
     .col-to { width: var(--col-to); }
     .col-note { /* flex remainder */ }
 
-    /* Printing for A4 with multi-page and page numbers */
+    /* Print A4 */
     @media print {
       body { background:#fff; color:#000; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .tab-nav, .btn, .notes-controls, .status-message, .report-controls { display: none !important; }
       .report-preview { border:none; padding:0; margin:0; max-width:none; }
       @page { size: A4; margin: 12mm; }
-      /* Re-number each sheet using counters; we inject numbers via JS as well for padding */
     }
 
     @media (max-width: 767px) {
@@ -271,7 +260,7 @@
   </div>
 
   <script>
-    // App state (no persistence)
+    // App state (no persistence to storage; purely in-memory)
     let appState = {
       author: '',
       incidentName: '',
@@ -279,10 +268,9 @@
       noIncident: false,
       dfesId: '',
       role: '',
-      diaryPageStart: null, // number or null
-      notes: [], // {id, timestamp, text, followUp, followUpDetails, followUpTimestamp, to, from, includeTo, includeFrom}
+      diaryPageStart: null,
+      notes: [],
       currentTab: 'setup',
-      // voice
       isRecording: false,
       recognition: null,
       voiceTranscript: ''
@@ -348,7 +336,7 @@
         if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); addNote(); }
       });
 
-      // Report search (moved from Notes)
+      // Report search
       $('reportSearchInput').addEventListener('input', () => {
         $('reportSearchClear').style.display = $('reportSearchInput').value ? 'inline-block' : 'none';
         generateReport();
@@ -549,7 +537,7 @@
     function generateReport() {
       const prev = $('reportPreview');
       if (appState.notes.length === 0) {
-        prev.innerHTML = '<div class="status-message status-info">Add notes to generate report.</div>';
+        prev.innerHTML = '<div class="status-message status-info">Add notes to generate a report.</div>';
         toggleReportButtons(false);
         return;
       }
@@ -573,14 +561,11 @@
       const author = appState.author;
       const role = appState.role;
 
-      // Pagination logic: build pages (A4). We’ll approximate rows per page (depends on print metrics).
-      // To keep it robust without measuring, we split by a max rows per page.
-      const rowsPerPage = 28; // tweak as needed for your printer margins and font size
+      const rowsPerPage = 28; // approximate; adjust if needed
       const pages = [];
       for (let i = 0; i < sourceNotes.length; i += rowsPerPage) {
         pages.push(sourceNotes.slice(i, i + rowsPerPage));
       }
-
       const startPage = appState.diaryPageStart != null ? appState.diaryPageStart : 1;
 
       const pagesHtml = pages.map((notesChunk, pageIndex) => {
