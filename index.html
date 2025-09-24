@@ -85,8 +85,8 @@
     .note-text { white-space: pre-wrap; line-height:1.45; }
 
     /* Report Tab */
-    .report-controls { max-width: 1000px; margin: 0 auto 8px; display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; justify-content:center; }
-    .report-search { position:relative; width: min(100%, 600px); }
+    .report-controls { max-width: 1300px; margin: 0 auto 8px; display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; justify-content:center; }
+    .report-search { position:relative; width: min(100%, 800px); }
     .report-search input {
       width:100%; padding:.65rem 2.25rem .65rem .75rem; border:1px solid #888; border-radius:6px;
       background:#fff; color:#000;
@@ -96,7 +96,11 @@
       background:#eee; border:1px solid #bbb; padding:.3rem .6rem; border-radius:4px; cursor:pointer;
     }
 
-    .report-preview { background:#fff; color:#000; border-radius:8px; padding:12px; border:1px solid #444; max-width: 1000px; margin: 0 auto 1rem; overflow:auto; }
+    /* Wider preview to resemble A4 landscape on screen */
+    .report-preview {
+      background:#fff; color:#000; border-radius:8px; padding:12px; border:1px solid #444;
+      max-width: 1300px; margin: 0 auto 1rem; overflow:auto;
+    }
 
     /* Grid style */
     :root{
@@ -106,9 +110,9 @@
       --grid-cell-size: 13px;
       --grid-border: #666;
       --grid-page-number: #d12a2a;
-      --col-datetime: 120px; /* compact for more note room */
-      --col-from: 120px;
-      --col-to: 120px;
+      --col-datetime: 140px; /* landscape gives space, keep compact */
+      --col-from: 130px;
+      --col-to: 130px;
       --col-note: auto;
     }
 
@@ -134,12 +138,12 @@
     .col-to { width: var(--col-to); }
     .col-note { /* flex remainder */ }
 
-    /* Print A4 */
+    /* Print: A4 landscape */
     @media print {
       body { background:#fff; color:#000; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .tab-nav, .btn, .notes-controls, .status-message, .report-controls { display: none !important; }
       .report-preview { border:none; padding:0; margin:0; max-width:none; }
-      @page { size: A4; margin: 12mm; }
+      @page { size: A4 landscape; margin: 12mm; }
     }
 
     @media (max-width: 767px) {
@@ -208,7 +212,7 @@
 
     <!-- Notes -->
     <main id="notes-tab" class="tab-content" role="tabpanel" aria-labelledby="notes-btn">
-      <div class="notes-controls" style="max-width:900px; margin:0 auto;">
+      <div class="notes-controls" style="max-width:1100px; margin:0 auto;">
         <textarea id="noteInput" class="note-input" placeholder="Enter your note here..."></textarea>
 
         <div class="input-row">
@@ -260,7 +264,7 @@
   </div>
 
   <script>
-    // App state (no persistence to storage; purely in-memory)
+    // App state (in-memory)
     let appState = {
       author: '',
       incidentName: '',
@@ -533,7 +537,7 @@
       }).join('');
     }
 
-    // Report generation — supports A4 pagination and padded page numbers
+    // Report generation — A4 landscape pagination and padded page numbers
     function generateReport() {
       const prev = $('reportPreview');
       if (appState.notes.length === 0) {
@@ -561,7 +565,8 @@
       const author = appState.author;
       const role = appState.role;
 
-      const rowsPerPage = 28; // approximate; adjust if needed
+      // More rows fit in landscape; adjust estimate
+      const rowsPerPage = 22; // each row taller due to columns; tune as needed
       const pages = [];
       for (let i = 0; i < sourceNotes.length; i += rowsPerPage) {
         pages.push(sourceNotes.slice(i, i + rowsPerPage));
@@ -596,30 +601,12 @@
             </div>
 
             <div class="dfes-meta">
-              <div class="field">
-                <div class="label">DATE:</div>
-                <div class="value">${dateStr}</div>
-              </div>
-              <div class="field">
-                <div class="label">INCIDENT NAME:</div>
-                <div class="value">${incName || '&nbsp;'}</div>
-              </div>
-              <div class="field">
-                <div class="label">INCIDENT No.:</div>
-                <div class="value">${incNumber || '&nbsp;'}</div>
-              </div>
-              <div class="field">
-                <div class="label">NAME:</div>
-                <div class="value">${escapeHtml(author)}</div>
-              </div>
-              <div class="field">
-                <div class="label">ROLE:</div>
-                <div class="value">${escapeHtml(role)}</div>
-              </div>
-              <div class="field">
-                <div class="label">SERVICE No:</div>
-                <div class="value">${escapeHtml(dfesId)}</div>
-              </div>
+              <div class="field"><div class="label">DATE:</div><div class="value">${dateStr}</div></div>
+              <div class="field"><div class="label">INCIDENT NAME:</div><div class="value">${incName || '&nbsp;'}</div></div>
+              <div class="field"><div class="label">INCIDENT No.:</div><div class="value">${incNumber || '&nbsp;'}</div></div>
+              <div class="field"><div class="label">NAME:</div><div class="value">${escapeHtml(author)}</div></div>
+              <div class="field"><div class="label">ROLE:</div><div class="value">${escapeHtml(role)}</div></div>
+              <div class="field"><div class="label">SERVICE No:</div><div class="value">${escapeHtml(dfesId)}</div></div>
             </div>
 
             <table class="dfes-grid" role="table" aria-label="Incident diary grid">
@@ -647,7 +634,7 @@
       ['downloadPdfBtn', 'emailBtn'].forEach(id => { const b = $(id); if (b) b.disabled = !enabled; });
     }
 
-    // Print (A4, multiple pages)
+    // Print (A4 landscape)
     function printToPdf() {
       const w = window.open('', '_blank');
       const html = `
@@ -669,7 +656,7 @@
     function generateEmailBody() {
       const lines = [];
       const dateStr = new Date().toLocaleDateString('en-GB');
-      lines.push(`PERSONAL INCIDENT DIARY`);
+      lines.push(`PERSONAL INCIDENT DIARY (Landscape)`);
       lines.push(`Date: ${dateStr}`);
       lines.push(`Incident Name: ${appState.incidentName || ''}`);
       lines.push(`Incident No: ${appState.noIncident ? 'N/A' : appState.incidentNumber}`);
