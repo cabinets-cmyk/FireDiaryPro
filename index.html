@@ -83,6 +83,7 @@
       --col-datetime: 140px;
       --col-from: 130px;
       --col-to: 130px;
+      --col-note: auto;
     }
 
     .dfes-sheet { font-family: var(--grid-font); background:#fff; color:#000; border: 1px solid var(--grid-border); padding: 12px; }
@@ -104,7 +105,7 @@
       font-family: var(--grid-font);
       font-size: var(--grid-label-size);
     }
-    .meta-table colgroup col { width: 16.666%; } /* 6 equal columns */
+    .meta-table colgroup col { width: 16.666%; } /* 6 equal columns for label|value × 3 */
     .meta-table th, .meta-table td {
       border: 1px solid var(--grid-border);
       padding: 4px 6px;
@@ -112,8 +113,7 @@
       background: #fff;
       min-height: 28px;
       line-height: 1.2;
-      /* prevent one-letter-per-line printing */
-      white-space: nowrap;
+      white-space: nowrap;      /* prevent one-char-per-line */
       word-break: normal;
       overflow-wrap: normal;
     }
@@ -195,11 +195,13 @@
     <main id="notes-tab" class="tab-content" role="tabpanel" aria-labelledby="notes-btn">
       <div class="notes-controls" style="max-width:1100px; margin:0 auto;">
         <textarea id="noteInput" class="note-input" placeholder="Enter your note here..."></textarea>
+
         <div class="input-row">
           <button id="voiceBtn" class="voice-btn" type="button">🎤 Voice</button>
           <button id="addNoteBtn" class="btn" type="button">Add Note</button>
         </div>
 
+        <!-- To / From panel -->
         <div class="tofrom-panel" aria-label="To/From options">
           <div class="tofrom-row">
             <label for="fromName">From</label>
@@ -243,6 +245,7 @@
   </div>
 
   <script>
+    // In-memory state
     var appState = {
       author: "",
       incidentName: "",
@@ -258,6 +261,7 @@
       voiceTranscript: ""
     };
 
+    // Helpers
     function $(id){ return document.getElementById(id); }
     function show(el){ el.style.display = "block"; }
     function hide(el){ el.style.display = "none"; }
@@ -289,6 +293,7 @@
 
     document.addEventListener("DOMContentLoaded", function(){
       setupEvents();
+      setupSpeechRecognition();
     });
 
     function setupEvents(){
@@ -374,6 +379,7 @@
       if (tab === "notes") renderNotes();
     }
 
+    // Notes
     function addNote(){
       var text = $("noteInput").value.trim();
       var toName = $("toName") ? $("toName").value.trim() : "";
@@ -466,7 +472,7 @@
       }).join("");
     }
 
-    // Report generation
+    // Report generation: condensed 2×3 header
     function generateReport(){
       var prev = $("reportPreview");
       if (appState.notes.length === 0) {
@@ -630,6 +636,113 @@
       generateReport();
       showStatus("voiceStatus", "All data cleared.", "success");
       setTimeout(function(){ hideStatus("voiceStatus"); }, 1500);
+    }
+
+    // Voice-to-Text: robust setup
+    function setupSpeechRecognition() {
+      var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      var voiceBtn = document.getElementById("voiceBtn");
+      if (!SR) {
+        if (voiceBtn) {
+          voiceBtn.disabled = true;
+          voiceBtn.textContent = "🎤 Not Supported";
+          voiceBtn.title = "Use Chrome/Edge over HTTPS (mic required)";
+        }
+        return;
+      }
+
+      var recognition = new SR();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = "en-AU"; // adjust if needed: en-GB, en-US, etc.
+
+      var isActive = false;
+      var finalText = "";
+
+      function start() {
+        if (isActive) return;
+        finalText = "";
+        try { recognition.start(); } catch (e) {}
+      }
+      function stop() {
+        if (!isActive) return;
+        try { recognition.stop(); } catch (e) {}
+      }
+
+      if (voiceBtn) {
+        voiceBtn.addEventListener("click", function() {
+          if (isActive) stop(); else start();
+        });
+      }
+
+      recognition.onstart = function() {
+        isActive = true;
+        if (voiceBtn) {
+          voiceBtn.classList.add("recording");
+          voiceBtn.textContent = "🔴 Recording...";
+        }
+        showStatus("voiceStatus", "Listening... Speak clearly into your microphone", "info");
+      };
+
+      recognition.onresult = function(ev) {
+        var interim = "";
+        for (var i = ev.resultIndex; i < ev.results.length; i++) {
+          var t = ev.results[i][0].transcript;
+          if (ev.results[i].isFinal) finalText += t + " ";
+          else interim += t;
+        }
+        if (interim) showStatus("voiceStatus", "Interim: " + interim, "info");
+        if (finalText.trim()) {
+          var box = document.getElementById("noteInput");
+          if (box) box.value = finalText.trim();
+        }
+      };
+
+      recognition.onerror = function(e) {
+        var msg = "";
+        switch (e.error) {
+          case "not-allowed":
+          case "permission-denied":
+            msg = "Microphone access denied. Allow mic in site settings, then reload.";
+            break;
+          case "no-speech":
+            msg = "No speech detected. Try again and speak closer to the microphone.";
+            break;
+          case "audio-capture":
+            msg = "No microphone found. Check your mic connection and OS settings.";
+            break;
+          case "network":
+            msg = "Network error. Check your connection and try again.";
+            break;
+          case "aborted":
+            msg = "Listening stopped.";
+            break;
+          default:
+            msg = "Voice error: " + e.error;
+        }
+        showStatus("voiceStatus", msg, "error");
+        isActive = false;
+        if (voiceBtn) {
+          voiceBtn.classList.remove("recording");
+          voiceBtn.textContent = "🎤 Voice";
+        }
+      };
+
+      recognition.onend = function() {
+        isActive = false;
+        if (voiceBtn) {
+          voiceBtn.classList.remove("recording");
+          voiceBtn.textContent = "🎤 Voice";
+        }
+        var box = document.getElementById("noteInput");
+        if (box && finalText.trim()) {
+          box.value = finalText.trim();
+          showStatus("voiceStatus", "Transcript ready. Edit if needed, then click Add Note.", "success");
+          setTimeout(function(){ hideStatus("voiceStatus"); }, 2500);
+        }
+      };
+
+      appState.recognition = recognition;
     }
   </script>
 </body>
