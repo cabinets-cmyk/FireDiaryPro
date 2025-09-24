@@ -118,7 +118,18 @@
     .dfes-sheet { font-family: var(--grid-font); background:#fff; color:#000; border: 1px solid var(--grid-border); padding: 12px; }
     .dfes-title { text-align:center; font-weight: 800; font-size: var(--grid-title-size); }
 
-    /* Two-row, three-column meta layout (tidy header) */
+    /* Page line sits right, same row as title visually */
+    .dfes-page-row {
+      display:grid; grid-template-columns: 1fr auto; align-items:center;
+      border-bottom: 1px solid var(--grid-border); padding-bottom: 6px; margin-bottom: 6px; margin-top: 6px;
+    }
+    .dfes-page { text-align:right; font-size: var(--grid-label-size); }
+    .dfes-page .num { color: var(--grid-page-number); font-weight: 800; }
+
+    /* Condensed meta: 2 rows x 3 columns in specific order:
+       Row 1: Incident Name | Incident Number | Date
+       Row 2: Name | Role | Service Number
+    */
     .dfes-meta6 {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -128,14 +139,6 @@
     .field { border:1px solid var(--grid-border); font-size: var(--grid-label-size); display:grid; grid-template-rows: auto 28px; }
     .field .label { padding: 2px 6px; border-bottom:1px solid var(--grid-border); background:#f6f6f6; }
     .field .value { padding: 4px 6px; font-weight: 600; min-height: 28px; }
-
-    /* Page line sits right, same row as title visually */
-    .dfes-page-row {
-      display:grid; grid-template-columns: 1fr auto; align-items:center;
-      border-bottom: 1px solid var(--grid-border); padding-bottom: 6px; margin-bottom: 6px; margin-top: 6px;
-    }
-    .dfes-page { text-align:right; font-size: var(--grid-label-size); }
-    .dfes-page .num { color: var(--grid-page-number); font-weight: 800; }
 
     .dfes-grid { margin-top: 6px; border: 1px solid var(--grid-border); border-collapse: collapse; width:100%; table-layout: fixed; }
     .dfes-grid th, .dfes-grid td { border:1px solid var(--grid-border); padding: 4px 6px; font-size: var(--grid-cell-size); vertical-align: top; }
@@ -544,7 +547,7 @@
       }).join('');
     }
 
-    // Report generation — A4 landscape, meta in 2 rows × 3 columns
+    // Report generation — A4 landscape, condensed header (2 rows × 3 columns)
     function generateReport() {
       const prev = $('reportPreview');
       if (appState.notes.length === 0) {
@@ -572,6 +575,7 @@
       const author = appState.author;
       const role = appState.role;
 
+      // Pagination
       const rowsPerPage = 22; // landscape estimate
       const pages = [];
       for (let i = 0; i < sourceNotes.length; i += rowsPerPage) {
@@ -607,12 +611,13 @@
               <div class="dfes-page">PAGE: <span class="num">${pageNumberPadded}</span></div>
             </div>
 
-            <!-- Two rows × three columns -->
+            <!-- Condensed header: 2 rows x 3 columns -->
             <div class="dfes-meta6">
-              <div class="field"><div class="label">DATE:</div><div class="value">${dateStr}</div></div>
+              <!-- Row 1 -->
               <div class="field"><div class="label">INCIDENT NAME:</div><div class="value">${incName || '&nbsp;'}</div></div>
               <div class="field"><div class="label">INCIDENT No.:</div><div class="value">${incNumber || '&nbsp;'}</div></div>
-
+              <div class="field"><div class="label">DATE:</div><div class="value">${dateStr}</div></div>
+              <!-- Row 2 -->
               <div class="field"><div class="label">NAME:</div><div class="value">${escapeHtml(author)}</div></div>
               <div class="field"><div class="label">ROLE:</div><div class="value">${escapeHtml(role)}</div></div>
               <div class="field"><div class="label">SERVICE No:</div><div class="value">${escapeHtml(dfesId)}</div></div>
@@ -648,8 +653,8 @@
       const w = window.open('', '_blank');
       const html = `
         <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Incident Diary Report</title>
         <style>${document.querySelector('style').innerHTML}</style>
+        <title>Incident Diary Report</title>
         </head><body>${$('reportPreview').innerHTML}</body></html>`;
       w.document.write(html);
       w.document.close();
@@ -666,9 +671,9 @@
       const lines = [];
       const dateStr = new Date().toLocaleDateString('en-GB');
       lines.push(`PERSONAL INCIDENT DIARY (Landscape)`);
-      lines.push(`Date: ${dateStr}`);
       lines.push(`Incident Name: ${appState.incidentName || ''}`);
       lines.push(`Incident No: ${appState.noIncident ? 'N/A' : appState.incidentNumber}`);
+      lines.push(`Date: ${dateStr}`);
       lines.push(`Name: ${appState.author}`);
       lines.push(`Role: ${appState.role}`);
       lines.push(`Service No: ${appState.dfesId}`);
