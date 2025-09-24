@@ -62,20 +62,11 @@
     .tofrom-checks label { display:flex; align-items:center; gap:.35rem; color:#bbb; }
 
     .status-message { padding:.75rem; border-radius:6px; margin:.75rem 0; text-align:center; font-weight:700; }
-    .status-info { background: rgba(59,130,246,.15); border:1px solid #3b82f6; color:#90b4ff; }
-    .status-success { background: rgba(34,197,94,.15); border:1px solid #22c55e; color:#6ee7b7; }
-    .status-error { background: rgba(239,68,68,.15); border:1px solid #ef4444; color:#fda4af; }
 
     .report-controls { max-width: 1300px; margin: 0 auto 8px; display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; justify-content:center; }
     .report-search { position:relative; width: min(100%, 800px); }
-    .report-search input {
-      width:100%; padding:.65rem 2.25rem .65rem .75rem; border:1px solid #888; border-radius:6px;
-      background:#fff; color:#000;
-    }
-    .report-search button {
-      position:absolute; right:.25rem; top:50%; transform:translateY(-50%);
-      background:#eee; border:1px solid #bbb; padding:.3rem .6rem; border-radius:4px; cursor:pointer;
-    }
+    .report-search input { width:100%; padding:.65rem 2.25rem .65rem .75rem; border:1px solid #888; border-radius:6px; background:#fff; color:#000; }
+    .report-search button { position:absolute; right:.25rem; top:50%; transform:translateY(-50%); background:#eee; border:1px solid #bbb; padding:.3rem .6rem; border-radius:4px; cursor:pointer; }
 
     .report-preview {
       background:#fff; color:#000; border-radius:8px; padding:12px; border:1px solid #444;
@@ -98,6 +89,7 @@
     .dfes-sheet { font-family: var(--grid-font); background:#fff; color:#000; border: 1px solid var(--grid-border); padding: 12px; }
     .dfes-title { text-align:center; font-weight: 800; font-size: var(--grid-title-size); }
 
+    /* Title row + page number on right */
     .dfes-page-row {
       display:grid; grid-template-columns: 1fr auto; align-items:center;
       border-bottom: 1px solid var(--grid-border); padding-bottom: 6px; margin: 6px 0;
@@ -105,16 +97,31 @@
     .dfes-page { text-align:right; font-size: var(--grid-label-size); }
     .dfes-page .num { color: var(--grid-page-number); font-weight: 800; }
 
-    .dfes-meta6 {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      grid-auto-rows: minmax(38px, auto);
-      gap: 6px;
+    /* Condensed 2x3 header as a single table (most robust for printing) */
+    .meta-table {
+      width: 100%;
+      border-collapse: collapse;
       margin: 8px 0 10px 0;
+      font-family: var(--grid-font);
+      font-size: var(--grid-label-size);
+      table-layout: fixed;
     }
-    .field { border:1px solid var(--grid-border); font-size: var(--grid-label-size); display:grid; grid-template-rows: auto auto; background:#fff; }
-    .field .label { padding: 4px 6px; border-bottom:1px solid var(--grid-border); background:#f6f6f6; font-weight:700; }
-    .field .value { padding: 6px 6px; font-weight: 700; }
+    .meta-table th, .meta-table td {
+      border: 1px solid var(--grid-border);
+      padding: 4px 6px;
+      vertical-align: middle;
+      background: #fff;
+      word-wrap: break-word;
+    }
+    .meta-label {
+      background: #f6f6f6;
+      font-weight: 700;
+      width: 33.333%;
+    }
+    .meta-value {
+      font-weight: 700;
+      color: #000;
+    }
 
     .dfes-grid { margin-top: 6px; border: 1px solid var(--grid-border); border-collapse: collapse; width:100%; table-layout: fixed; }
     .dfes-grid th, .dfes-grid td { border:1px solid var(--grid-border); padding: 4px 6px; font-size: var(--grid-cell-size); vertical-align: top; }
@@ -134,7 +141,6 @@
       .tab-btn { padding: 1.1rem .5rem; font-size: .85rem; }
       .btn, .voice-btn { padding: 1rem; font-size: 1.05rem; }
       .tofrom-row { grid-template-columns: 1fr; }
-      .dfes-meta6 { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -151,6 +157,7 @@
       <button id="report-btn" class="tab-btn" role="tab" aria-selected="false" aria-controls="report-tab" disabled>📄 Report</button>
     </nav>
 
+    <!-- Setup -->
     <main id="setup-tab" class="tab-content active" role="tabpanel" aria-labelledby="setup-btn">
       <form id="setupForm" class="setup-form">
         <div class="form-group">
@@ -187,6 +194,7 @@
       <div id="setupStatus" class="status-message" style="display:none;"></div>
     </main>
 
+    <!-- Notes -->
     <main id="notes-tab" class="tab-content" role="tabpanel" aria-labelledby="notes-btn">
       <div class="notes-controls" style="max-width:1100px; margin:0 auto;">
         <textarea id="noteInput" class="note-input" placeholder="Enter your note here..."></textarea>
@@ -194,6 +202,7 @@
           <button id="voiceBtn" class="voice-btn" type="button">🎤 Voice</button>
           <button id="addNoteBtn" class="btn" type="button">Add Note</button>
         </div>
+
         <div class="tofrom-panel" aria-label="To/From options">
           <div class="tofrom-row">
             <label for="fromName">From</label>
@@ -207,13 +216,16 @@
             <label><input type="checkbox" id="followUpCheckbox"/> Requires Follow Up</label>
           </div>
         </div>
+
         <div id="voiceStatus" class="status-message" style="display:none;"></div>
       </div>
+
       <div id="notesList" class="notes-list" role="region" aria-label="Notes list">
         <div class="status-message status-info">No notes yet. Add your first note above!</div>
       </div>
     </main>
 
+    <!-- Report -->
     <main id="report-tab" class="tab-content" role="tabpanel" aria-labelledby="report-btn">
       <div class="report-controls">
         <div class="report-search">
@@ -235,7 +247,7 @@
 
   <script>
     // In-memory state
-    let appState = {
+    var appState = {
       author: "",
       incidentName: "",
       incidentNumber: "",
@@ -250,7 +262,6 @@
       voiceTranscript: ""
     };
 
-    // Helpers
     function $(id){ return document.getElementById(id); }
     function show(el){ el.style.display = "block"; }
     function hide(el){ el.style.display = "none"; }
@@ -261,15 +272,14 @@
       show(el);
     }
     function hideStatus(id){ var el = $(id); if(el) hide(el); }
-    function formatTimestamp(ts, withSeconds){
+    function formatTimestamp(ts){
       var d = new Date(ts);
       var dd = String(d.getDate()).padStart(2,"0");
       var mm = String(d.getMonth()+1).padStart(2,"0");
       var yy = String(d.getFullYear()).slice(-2);
       var hh = String(d.getHours()).padStart(2,"0");
       var mi = String(d.getMinutes()).padStart(2,"0");
-      var ss = String(d.getSeconds()).padStart(2,"0");
-      return dd + "/" + mm + "/" + yy + " " + hh + ":" + mi + (withSeconds ? ":" + ss : "");
+      return dd + "/" + mm + "/" + yy + " " + hh + ":" + mi;
     }
     function escapeHtml(text){
       var div = document.createElement("div");
@@ -376,7 +386,6 @@
       var fromName = $("fromName").value.trim();
       var includeTo = $("includeTo").checked && toName.length > 0;
       var includeFrom = $("includeFrom").checked && fromName.length > 0;
-
       if (!text) return;
 
       var note = {
@@ -395,7 +404,6 @@
 
       $("noteInput").value = "";
       $("followUpCheckbox").checked = false;
-
       renderNotes();
       showStatus("voiceStatus", "Note added.", "success");
       setTimeout(function(){ hideStatus("voiceStatus"); }, 2000);
@@ -480,28 +488,13 @@
             '</div>' +
             '<div class="note-content">' +
               '<div id="note-text-' + n.id + '" class="note-text">' + escapeHtml(n.text) + '</div>' +
-              (n.followUp && !n.followUpDetails
-                ? '<div id="followup-input-' + n.id + '" style="margin-top:.5rem;">' +
-                    '<textarea class="note-followup-details" placeholder="Enter follow up details..." style="width:100%; min-height:60px; padding:.5rem; border:1px solid #444; background:#1a1a1a; color:#fff; border-radius:6px;"></textarea>' +
-                    '<div class="input-row" style="margin-top:.5rem;">' +
-                      '<button class="btn btn-secondary" data-action="complete-followup" style="width:auto;">Complete Follow Up</button>' +
-                    '</div>' +
-                  '</div>'
-                : ''
-              ) +
-              (n.followUpDetails
-                ? '<div class="status-message status-info" style="margin-top:.5rem; text-align:left;">' +
-                    '<strong>Follow-up @ ' + formatTimestamp(n.followUpTimestamp) + ':</strong><br>' + escapeHtml(n.followUpDetails) +
-                  '</div>'
-                : ''
-              ) +
             '</div>' +
           '</div>'
         );
       }).join("");
     }
 
-    // Report generation with condensed header (2 rows × 3 columns)
+    // Generate report: header as 2x3 table
     function generateReport(){
       var prev = $("reportPreview");
       if (appState.notes.length === 0) {
@@ -514,10 +507,10 @@
       var sourceNotes = appState.notes.slice().reverse().filter(function(n){
         if (!searchTerm) return true;
         return (
-          (n.text || "").toLowerCase().includes(searchTerm) ||
-          (n.followUpDetails || "").toLowerCase().includes(searchTerm) ||
-          (n.includeFrom ? (n.from || "").toLowerCase().includes(searchTerm) : false) ||
-          (n.includeTo ? (n.to || "").toLowerCase().includes(searchTerm) : false) ||
+          (n.text||"").toLowerCase().includes(searchTerm) ||
+          (n.followUpDetails||"").toLowerCase().includes(searchTerm) ||
+          (n.includeFrom ? (n.from||"").toLowerCase().includes(searchTerm) : false) ||
+          (n.includeTo ? (n.to||"").toLowerCase().includes(searchTerm) : false) ||
           formatTimestamp(n.timestamp).toLowerCase().includes(searchTerm)
         );
       });
@@ -538,22 +531,43 @@
 
       var pagesHtml = pages.map(function(notesChunk, pageIndex){
         var pageNumberPadded = pad6(startPage + pageIndex);
+
         var rowsHtml = notesChunk.map(function(n){
           var datetime = formatTimestamp(n.timestamp);
           var from = n.includeFrom ? escapeHtml(n.from) : "";
           var to = n.includeTo ? escapeHtml(n.to) : "";
           var noteText = escapeHtml(n.text);
-          var fu = n.followUp ? " (Follow-up required)" : "";
-          var fuDet = n.followUpDetails ? "<br>Follow-up @ " + escapeHtml(formatTimestamp(n.followUpTimestamp)) + ": " + escapeHtml(n.followUpDetails) : "";
           return (
             "<tr>" +
               '<td class="col-datetime">' + datetime + "</td>" +
               '<td class="col-from">' + from + "</td>" +
               '<td class="col-to">' + to + "</td>" +
-              '<td class="col-note">' + noteText + fu + fuDet + "</td>" +
+              '<td class="col-note">' + noteText + "</td>" +
             "</tr>"
           );
         }).join("");
+
+        var metaTable =
+          '<table class="meta-table" aria-label="Incident meta">' +
+            "<tbody>" +
+              "<tr>" +
+                '<th class="meta-label">INCIDENT NAME:</th>' +
+                '<td class="meta-value">' + (incName || "&nbsp;") + "</td>" +
+                '<th class="meta-label">INCIDENT No.:</th>' +
+                '<td class="meta-value">' + (incNumber || "&nbsp;") + "</td>" +
+                '<th class="meta-label">DATE:</th>' +
+                '<td class="meta-value">' + dateStr + "</td>" +
+              "</tr>" +
+              "<tr>" +
+                '<th class="meta-label">NAME:</th>' +
+                '<td class="meta-value">' + escapeHtml(author) + "</td>" +
+                '<th class="meta-label">ROLE:</th>' +
+                '<td class="meta-value">' + escapeHtml(role) + "</td>" +
+                '<th class="meta-label">SERVICE No:</th>' +
+                '<td class="meta-value">' + escapeHtml(dfesId) + "</td>" +
+              "</tr>" +
+            "</tbody>" +
+          "</table>";
 
         return (
           '<section class="dfes-sheet" style="' + (pageIndex < pages.length - 1 ? "page-break-after: always;" : "") + '">' +
@@ -562,14 +576,7 @@
               "<div></div>" +
               '<div class="dfes-page">PAGE: <span class="num">' + pageNumberPadded + "</span></div>" +
             "</div>" +
-            '<div class="dfes-meta6">' +
-              '<div class="field"><div class="label">INCIDENT NAME:</div><div class="value">' + (incName || "&nbsp;") + "</div></div>" +
-              '<div class="field"><div class="label">INCIDENT No.:</div><div class="value">' + (incNumber || "&nbsp;") + "</div></div>" +
-              '<div class="field"><div class="label">DATE:</div><div class="value">' + dateStr + "</div></div>" +
-              '<div class="field"><div class="label">NAME:</div><div class="value">' + escapeHtml(author) + "</div></div>" +
-              '<div class="field"><div class="label">ROLE:</div><div class="value">' + escapeHtml(role) + "</div></div>" +
-              '<div class="field"><div class="label">SERVICE No:</div><div class="value">' + escapeHtml(dfesId) + "</div></div>" +
-            "</div>" +
+            metaTable +
             '<table class="dfes-grid" role="table" aria-label="Incident diary grid">' +
               "<thead>" +
                 "<tr>" +
@@ -631,8 +638,6 @@
       appState.notes.slice().reverse().forEach(function(n){
         lines.push("Date & Time: " + formatTimestamp(n.timestamp) + " | From: " + (n.includeFrom ? n.from : "") + " | To: " + (n.includeTo ? n.to : ""));
         lines.push(n.text);
-        if (n.followUp) lines.push("Follow-up required.");
-        if (n.followUpDetails) lines.push("Follow-up @ " + formatTimestamp(n.followUpTimestamp) + ": " + n.followUpDetails);
         lines.push("");
       });
       return lines.join("\n");
