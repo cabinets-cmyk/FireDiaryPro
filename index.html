@@ -83,7 +83,6 @@
       --col-datetime: 140px;
       --col-from: 130px;
       --col-to: 130px;
-      --col-note: auto;
     }
 
     .dfes-sheet { font-family: var(--grid-font); background:#fff; color:#000; border: 1px solid var(--grid-border); padding: 12px; }
@@ -97,31 +96,29 @@
     .dfes-page { text-align:right; font-size: var(--grid-label-size); }
     .dfes-page .num { color: var(--grid-page-number); font-weight: 800; }
 
-    /* Condensed 2x3 header as a single table (most robust for printing) */
+    /* Strict 2x3 meta table with no vertical character wrapping */
     .meta-table {
       width: 100%;
       border-collapse: collapse;
       margin: 8px 0 10px 0;
       font-family: var(--grid-font);
       font-size: var(--grid-label-size);
-      table-layout: fixed;
     }
+    .meta-table colgroup col { width: 16.666%; } /* 6 equal columns */
     .meta-table th, .meta-table td {
       border: 1px solid var(--grid-border);
       padding: 4px 6px;
       vertical-align: middle;
       background: #fff;
-      word-wrap: break-word;
+      min-height: 28px;
+      line-height: 1.2;
+      /* prevent one-letter-per-line printing */
+      white-space: nowrap;
+      word-break: normal;
+      overflow-wrap: normal;
     }
-    .meta-label {
-      background: #f6f6f6;
-      font-weight: 700;
-      width: 33.333%;
-    }
-    .meta-value {
-      font-weight: 700;
-      color: #000;
-    }
+    .meta-label { background: #f6f6f6; font-weight: 700; color:#000; }
+    .meta-value { font-weight: 700; color: #000; }
 
     .dfes-grid { margin-top: 6px; border: 1px solid var(--grid-border); border-collapse: collapse; width:100%; table-layout: fixed; }
     .dfes-grid th, .dfes-grid td { border:1px solid var(--grid-border); padding: 4px 6px; font-size: var(--grid-cell-size); vertical-align: top; }
@@ -246,7 +243,6 @@
   </div>
 
   <script>
-    // In-memory state
     var appState = {
       author: "",
       incidentName: "",
@@ -293,7 +289,6 @@
 
     document.addEventListener("DOMContentLoaded", function(){
       setupEvents();
-      setupSpeechRecognition();
     });
 
     function setupEvents(){
@@ -381,29 +376,23 @@
 
     function addNote(){
       var text = $("noteInput").value.trim();
-      var follow = $("followUpCheckbox").checked;
-      var toName = $("toName").value.trim();
-      var fromName = $("fromName").value.trim();
-      var includeTo = $("includeTo").checked && toName.length > 0;
-      var includeFrom = $("includeFrom").checked && fromName.length > 0;
+      var toName = $("toName") ? $("toName").value.trim() : "";
+      var fromName = $("fromName") ? $("fromName").value.trim() : "";
+      var includeTo = $("includeTo") ? $("includeTo").checked && toName.length > 0 : false;
+      var includeFrom = $("includeFrom") ? $("includeFrom").checked && fromName.length > 0 : false;
       if (!text) return;
 
       var note = {
         id: Date.now(),
         timestamp: new Date(),
         text: text,
-        followUp: follow,
-        followUpDetails: "",
-        followUpTimestamp: null,
         to: toName,
         from: fromName,
         includeTo: includeTo,
         includeFrom: includeFrom
       };
       appState.notes.unshift(note);
-
       $("noteInput").value = "";
-      $("followUpCheckbox").checked = false;
       renderNotes();
       showStatus("voiceStatus", "Note added.", "success");
       setTimeout(function(){ hideStatus("voiceStatus"); }, 2000);
@@ -414,7 +403,6 @@
       appState.notes = appState.notes.filter(function(n){ return n.id !== id; });
       renderNotes();
     }
-
     function editNoteInline(id){
       var textEl = document.getElementById("note-text-" + id);
       var n = appState.notes.find(function(x){ return x.id === id; });
@@ -428,7 +416,6 @@
         '</div>';
       document.getElementById("edit-" + id).focus();
     }
-
     function saveNoteEdit(id){
       var ta = document.getElementById("edit-" + id);
       if (!ta) return;
@@ -438,20 +425,7 @@
       if (newText) n.text = newText;
       renderNotes();
     }
-
     function cancelNoteEdit(){ renderNotes(); }
-
-    function completeFollowUp(id){
-      var n = appState.notes.find(function(x){ return x.id === id; });
-      if (!n) return;
-      var ta = document.querySelector("#followup-input-" + id + " .note-followup-details");
-      n.followUpDetails = (ta && ta.value ? ta.value : "").trim();
-      n.followUpTimestamp = new Date();
-      renderNotes();
-      showStatus("voiceStatus", "Follow up recorded.", "success");
-      setTimeout(function(){ hideStatus("voiceStatus"); }, 1500);
-    }
-
     function notesListClick(e){
       var actionEl = e.target.closest("[data-action]");
       if (!actionEl) return;
@@ -462,7 +436,6 @@
       else if (action === "edit-note") editNoteInline(id);
       else if (action === "save-edit") saveNoteEdit(id);
       else if (action === "cancel-edit") cancelNoteEdit();
-      else if (action === "complete-followup") completeFollowUp(id);
     }
 
     function renderNotes(){
@@ -476,25 +449,24 @@
         var t = formatTimestamp(n.timestamp);
         var toStr = n.includeTo ? " | To: " + escapeHtml(n.to) : "";
         var fromStr = n.includeFrom ? " | From: " + escapeHtml(n.from) : "";
-        var fu = n.followUp ? " | Follow-up: Yes" : "";
         return (
           '<div class="note-item" data-note-id="' + n.id + '">' +
-            '<div class="note-header">' +
-              '<div class="note-timestamp">' + t + fromStr + toStr + fu + '</div>' +
-              '<div class="note-actions">' +
-                '<button class="note-action-btn" data-action="edit-note" title="Edit">✏️</button>' +
-                '<button class="note-action-btn" data-action="delete-note" title="Delete">🗑️</button>' +
+            '<div class="note-header" style="background:#333; padding:.6rem .75rem; display:flex; justify-content:space-between; align-items:center;">' +
+              '<div class="note-timestamp" style="color:#ff6666; font-weight:700; font-size:.9rem;">' + t + fromStr + toStr + '</div>' +
+              '<div class="note-actions" style="display:flex; gap:.5rem;">' +
+                '<button class="note-action-btn" data-action="edit-note" title="Edit" style="background:none; border:none; color:#ccc; cursor:pointer; font-size:1rem;">✏️</button>' +
+                '<button class="note-action-btn" data-action="delete-note" title="Delete" style="background:none; border:none; color:#ccc; cursor:pointer; font-size:1rem;">🗑️</button>' +
               '</div>' +
             '</div>' +
-            '<div class="note-content">' +
-              '<div id="note-text-' + n.id + '" class="note-text">' + escapeHtml(n.text) + '</div>' +
+            '<div class="note-content" style="padding:.75rem; border-top:1px solid #444;">' +
+              '<div id="note-text-' + n.id + '" class="note-text" style="white-space: pre-wrap; line-height:1.45;">' + escapeHtml(n.text) + '</div>' +
             '</div>' +
           '</div>'
         );
       }).join("");
     }
 
-    // Generate report: header as 2x3 table
+    // Report generation
     function generateReport(){
       var prev = $("reportPreview");
       if (appState.notes.length === 0) {
@@ -508,7 +480,6 @@
         if (!searchTerm) return true;
         return (
           (n.text||"").toLowerCase().includes(searchTerm) ||
-          (n.followUpDetails||"").toLowerCase().includes(searchTerm) ||
           (n.includeFrom ? (n.from||"").toLowerCase().includes(searchTerm) : false) ||
           (n.includeTo ? (n.to||"").toLowerCase().includes(searchTerm) : false) ||
           formatTimestamp(n.timestamp).toLowerCase().includes(searchTerm)
@@ -542,13 +513,14 @@
               '<td class="col-datetime">' + datetime + "</td>" +
               '<td class="col-from">' + from + "</td>" +
               '<td class="col-to">' + to + "</td>" +
-              '<td class="col-note">' + noteText + "</td>" +
+              '<td>' + noteText + "</td>" +
             "</tr>"
           );
         }).join("");
 
         var metaTable =
           '<table class="meta-table" aria-label="Incident meta">' +
+            '<colgroup><col><col><col><col><col><col></colgroup>' +
             "<tbody>" +
               "<tr>" +
                 '<th class="meta-label">INCIDENT NAME:</th>' +
@@ -583,7 +555,7 @@
                   '<th class="col-datetime">DATE & TIME</th>' +
                   '<th class="col-from">FROM</th>' +
                   '<th class="col-to">TO</th>' +
-                  '<th class="col-note">NOTE</th>' +
+                  "<th>NOTE</th>" +
                 "</tr>" +
               "</thead>" +
               "<tbody>" +
@@ -622,7 +594,6 @@
       var body = encodeURIComponent(generateEmailBody());
       window.location.href = "mailto:?subject=" + subject + "&body=" + body;
     }
-
     function generateEmailBody(){
       var lines = [];
       var dateStr = new Date().toLocaleDateString("en-GB");
@@ -651,11 +622,6 @@
       };
       $("setupForm").reset();
       $("noteInput").value = "";
-      $("followUpCheckbox").checked = false;
-      $("includeFrom").checked = true;
-      $("includeTo").checked = false;
-      $("fromName").value = "";
-      $("toName").value = "";
       $("incidentInfo").textContent = "Incident Logger - Set up your incident details";
       $("notes-btn").disabled = true;
       $("report-btn").disabled = true;
@@ -664,55 +630,6 @@
       generateReport();
       showStatus("voiceStatus", "All data cleared.", "success");
       setTimeout(function(){ hideStatus("voiceStatus"); }, 1500);
-    }
-
-    function setupSpeechRecognition(){
-      if (!("webkitSpeechRecognition" in window) && !("SpeechRecognition" in window)) {
-        var vb = $("voiceBtn"); vb.disabled = true; vb.textContent = "🎤 Not Supported"; vb.title = "Speech recognition not supported"; return;
-      }
-      var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      appState.recognition = new SR();
-      appState.recognition.continuous = true;
-      appState.recognition.interimResults = true;
-      appState.recognition.lang = "en-US";
-
-      $("voiceBtn").addEventListener("click", function(){
-        if (appState.isRecording) { appState.recognition.stop(); return; }
-        try { appState.recognition.start(); } catch (e) {}
-      });
-
-      appState.recognition.onstart = function(){
-        appState.isRecording = true;
-        appState.voiceTranscript = "";
-        $("voiceBtn").classList.add("recording");
-        $("voiceBtn").textContent = "🔴 Recording...";
-        showStatus("voiceStatus", "Listening... Speak now", "info");
-      };
-      appState.recognition.onresult = function(ev){
-        var interim = "";
-        for (var i = ev.resultIndex; i < ev.results.length; i++) {
-          var t = ev.results[i][0].transcript;
-          if (ev.results[i].isFinal) appState.voiceTranscript += t + " ";
-          else interim += t;
-        }
-        if (interim) showStatus("voiceStatus", "Interim: " + interim, "info");
-      };
-      appState.recognition.onerror = function(e){
-        showStatus("voiceStatus", "Voice error: " + e.error, "error");
-        stopVoice();
-      };
-      appState.recognition.onend = function(){
-        if (appState.voiceTranscript.trim()) $("noteInput").value = appState.voiceTranscript.trim();
-        stopVoice();
-        showStatus("voiceStatus", "Transcript ready. Edit if needed, then Add Note.", "success");
-        setTimeout(function(){ hideStatus("voiceStatus"); }, 2500);
-      };
-
-      function stopVoice(){
-        appState.isRecording = false;
-        $("voiceBtn").classList.remove("recording");
-        $("voiceBtn").textContent = "🎤 Voice";
-      }
     }
   </script>
 </body>
