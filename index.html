@@ -74,16 +74,6 @@
     .status-success { background: rgba(34,197,94,.15); border:1px solid #22c55e; color:#6ee7b7; }
     .status-error { background: rgba(239,68,68,.15); border:1px solid #ef4444; color:#fda4af; }
 
-    .notes-list { margin-top: 1rem; }
-    .note-item { background:#2a2a2a; border:1px solid #444; border-radius:8px; margin-bottom: .75rem; overflow:hidden; }
-    .note-header { background:#333; padding:.6rem .75rem; display:flex; justify-content:space-between; align-items:center; }
-    .note-timestamp { color:#ff6666; font-weight:700; font-size:.9rem; }
-    .note-actions { display:flex; gap:.5rem; }
-    .note-action-btn { background:none; border:none; color:#ccc; cursor:pointer; font-size:1rem; }
-    .note-action-btn:hover { color:#ff4444; }
-    .note-content { padding:.75rem; border-top:1px solid #444; }
-    .note-text { white-space: pre-wrap; line-height:1.45; }
-
     /* Report Tab */
     .report-controls { max-width: 1300px; margin: 0 auto 8px; display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; justify-content:center; }
     .report-search { position:relative; width: min(100%, 800px); }
@@ -118,27 +108,39 @@
     .dfes-sheet { font-family: var(--grid-font); background:#fff; color:#000; border: 1px solid var(--grid-border); padding: 12px; }
     .dfes-title { text-align:center; font-weight: 800; font-size: var(--grid-title-size); }
 
-    /* Page line sits right, same row as title visually */
+    /* Title row with page number on the right */
     .dfes-page-row {
       display:grid; grid-template-columns: 1fr auto; align-items:center;
-      border-bottom: 1px solid var(--grid-border); padding-bottom: 6px; margin-bottom: 6px; margin-top: 6px;
+      border-bottom: 1px solid var(--grid-border); padding-bottom: 6px; margin: 6px 0;
     }
     .dfes-page { text-align:right; font-size: var(--grid-label-size); }
     .dfes-page .num { color: var(--grid-page-number); font-weight: 800; }
 
-    /* Condensed meta: 2 rows x 3 columns in specific order:
-       Row 1: Incident Name | Incident Number | Date
-       Row 2: Name | Role | Service Number
-    */
+    /* Condensed header: strict 2 rows × 3 columns (matches screenshot) */
     .dfes-meta6 {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
+      grid-auto-rows: minmax(38px, auto);
       gap: 6px;
       margin: 8px 0 10px 0;
     }
-    .field { border:1px solid var(--grid-border); font-size: var(--grid-label-size); display:grid; grid-template-rows: auto 28px; }
-    .field .label { padding: 2px 6px; border-bottom:1px solid var(--grid-border); background:#f6f6f6; }
-    .field .value { padding: 4px 6px; font-weight: 600; min-height: 28px; }
+    .field {
+      border:1px solid var(--grid-border);
+      font-size: var(--grid-label-size);
+      display:grid;
+      grid-template-rows: auto auto;
+      background:#fff;
+    }
+    .field .label {
+      padding: 4px 6px;
+      border-bottom:1px solid var(--grid-border);
+      background:#f6f6f6;
+      font-weight:700;
+    }
+    .field .value {
+      padding: 6px 6px;
+      font-weight: 700;
+    }
 
     .dfes-grid { margin-top: 6px; border: 1px solid var(--grid-border); border-collapse: collapse; width:100%; table-layout: fixed; }
     .dfes-grid th, .dfes-grid td { border:1px solid var(--grid-border); padding: 4px 6px; font-size: var(--grid-cell-size); vertical-align: top; }
@@ -146,7 +148,7 @@
     .col-datetime { width: var(--col-datetime); }
     .col-from { width: var(--col-from); }
     .col-to { width: var(--col-to); }
-    .col-note { /* flex remainder */ }
+    .col-note { /* remaining width */ }
 
     /* Print: A4 landscape */
     @media print {
@@ -611,7 +613,7 @@
               <div class="dfes-page">PAGE: <span class="num">${pageNumberPadded}</span></div>
             </div>
 
-            <!-- Condensed header: 2 rows x 3 columns -->
+            <!-- Condensed header: 2 rows x 3 columns in required order -->
             <div class="dfes-meta6">
               <!-- Row 1 -->
               <div class="field"><div class="label">INCIDENT NAME:</div><div class="value">${incName || '&nbsp;'}</div></div>
@@ -663,27 +665,27 @@
 
     // Email (plain text summary)
     function emailReport() {
-      const subject = encodeURIComponent(`Incident Report ${appState.incidentNumber ? '- ' + appState.incidentNumber : ''}`);
+      const subject = encodeURIComponent(\`Incident Report \${appState.incidentNumber ? '- ' + appState.incidentNumber : ''}\`);
       const body = encodeURIComponent(generateEmailBody());
-      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+      window.location.href = \`mailto:?subject=\${subject}&body=\${body}\`;
     }
     function generateEmailBody() {
       const lines = [];
       const dateStr = new Date().toLocaleDateString('en-GB');
-      lines.push(`PERSONAL INCIDENT DIARY (Landscape)`);
-      lines.push(`Incident Name: ${appState.incidentName || ''}`);
-      lines.push(`Incident No: ${appState.noIncident ? 'N/A' : appState.incidentNumber}`);
-      lines.push(`Date: ${dateStr}`);
-      lines.push(`Name: ${appState.author}`);
-      lines.push(`Role: ${appState.role}`);
-      lines.push(`Service No: ${appState.dfesId}`);
-      lines.push(`Start Page: ${pad6(appState.diaryPageStart ?? 1)}`);
+      lines.push('PERSONAL INCIDENT DIARY (Landscape)');
+      lines.push(\`Incident Name: \${appState.incidentName || ''}\`);
+      lines.push(\`Incident No: \${appState.noIncident ? 'N/A' : appState.incidentNumber}\`);
+      lines.push(\`Date: \${dateStr}\`);
+      lines.push(\`Name: \${appState.author}\`);
+      lines.push(\`Role: \${appState.role}\`);
+      lines.push(\`Service No: \${appState.dfesId}\`);
+      lines.push(\`Start Page: \${pad6(appState.diaryPageStart ?? 1)}\`);
       lines.push('');
       appState.notes.slice().reverse().forEach(n => {
-        lines.push(`Date & Time: ${formatTimestamp(n.timestamp)} | From: ${n.includeFrom ? n.from : ''} | To: ${n.includeTo ? n.to : ''}`);
+        lines.push(\`Date & Time: \${formatTimestamp(n.timestamp)} | From: \${n.includeFrom ? n.from : ''} | To: \${n.includeTo ? n.to : ''}\`);
         lines.push(n.text);
         if (n.followUp) lines.push('Follow-up required.');
-        if (n.followUpDetails) lines.push(`Follow-up @ ${formatTimestamp(n.followUpTimestamp)}: ${n.followUpDetails}`);
+        if (n.followUpDetails) lines.push(\`Follow-up @ \${formatTimestamp(n.followUpTimestamp)}: \${n.followUpDetails}\`);
         lines.push('');
       });
       return lines.join('\n');
